@@ -1,3 +1,18 @@
+<!--
+    MUSIAL-v2.0-IVE
+    Author: Simon Hackl
+    Contact: simon.hackl@uni-tuebingen.de
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <!DOCTYPE html>
 <html>
 <body>
@@ -16,6 +31,7 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/resize-sensor@0.0.6/ResizeSensor.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.1.0/dist/echarts.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script type="text/javascript" src="./scripts/jerzy.js"></script>
     </head>
     <div id="main">
         <div id="headerMenu">
@@ -35,7 +51,7 @@
                                 <div>
                                     <button id="menuVARCAmbiguityModeSelectMaskBtn" onclick="VARCSetAmbiguityMode('MASK')" class="menuBtnActive">Mask</button>
                                     <button id="menuVARCAmbiguityModeSelectShowBtn" onclick="VARCSetAmbiguityMode('SHOW')">Show</button>
-                                    <button id="menuVARCAmbiguityModeSelectHideBtn" onclick="VARCSetAmbiguityMode('HIDE')">Hide</button>
+                                    <!-- <button id="menuVARCAmbiguityModeSelectHideBtn" onclick="VARCSetAmbiguityMode('HIDE')">Hide</button> -->
                                 </div>
                             </details>
                             <details>
@@ -70,17 +86,17 @@
                     </details>
                 </div>
             </details>
-            <a id="gitHubLink" href="https://github.com/Integrative-Transcriptomics/MUSIAL-2.0-IVE">
+            <a id="gitHubLink" href="https://github.com/Integrative-Transcriptomics/MUSIAL-2.0-IVE" target="_blank">
                 <i class="fab fa-github-square"></i>
             </a>
             <div id="title">
-                <b style = "color: var(--background-color)">MUSIAL <sub>IVE</sub></b>
+                <b style = "color: var(--background-color)">MUSIAL<sup>2.0</sup><sub>IVE</sub></b>
             </div>
         </div>
         <div id="inputComponent">
             <i id="directoryInputIcon" class="fas fa-folder-open"></i>
             <br>
-            <b id="directoryInputText">Click to open a MUSIAL output directory!</b>
+            <b id="directoryInputText">Click to open a MUSIAL<sup>2.0</sup> output directory!</b>
             <input id="directoryInput" type="file" onchange="directoryInputHandler( event )" webkitdirectory directory multiple>
             <div style="display: none;" id="directoryInputProcessLoader" class="spinner">
                 <div class="double-bounce1"></div>
@@ -88,7 +104,11 @@
             </div>
         </div>
         <div id="structureViewComponent">
-            <div id="structureViewContent" class="mol-container"></div>
+            <div id="structureViewContent" class="mol-container">
+                <div id="structureViewToolbox">
+                    <button id="STRCExpandBtn" class="structureViewToolboxButton" onclick="STRCExpand()"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
         </div>
         <div id="variantsViewComponent">
             <div id="variantsViewContent"></div>
@@ -112,8 +132,7 @@
                 <div id="infoContactContent" style="font-size: smaller;"></div>
             </div>
         </div>
-        <button id="imprintButton"><b>Imprint</b></button>
-        <button id="tutorialButton"><b>Tutorial</b></button>
+        <button id="imprintButton" onclick="displayImpressum()"><b>Impressum</b></button>
     </div>
 </body>
 </html>

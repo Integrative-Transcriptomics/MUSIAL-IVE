@@ -1,3 +1,19 @@
+/**
+    MUSIAL-v2.0-IVE
+    Author: Simon Hackl
+    Contact: simon.hackl@uni-tuebingen.de
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /*
 [1] Imports
 */
@@ -115,27 +131,13 @@ details > summary {
   border: none;
   border-radius: 2px;
 }
-/* Style for the Tutorial button element */
-#tutorialButton {
-  position: fixed;
-  bottom: -2px;
-  right: 50px;
-  margin-right: 0.5em;
-  padding-bottom: 4px;
-  color: var(--background-color);
-  font-size: 0.6em;
-  cursor: pointer;
-  background-color: var(--color-4);
-  border: none;
-  border-radius: 2px;
-}
 /* Style for the GitHub link element */
 #gitHubLink {
   position: fixed;
   display: inline-block;
   align-items: center;
   margin: 0.5em;
-  right: 3em;
+  right: 3.2em;
   font-size: 2em;
   color: var(--background-color-2);
 }
@@ -263,7 +265,7 @@ details > summary {
   color: var(--color-2);
 }
 #inputComponent .fa-exclamation-triangle {
-  font-size: 30em;
+  font-size: 20em;
   color: var(--error-color);
 }
 #inputComponent b {
@@ -298,7 +300,7 @@ details > summary {
   background-color: var(--background-color-3);
   border: 1px solid var(--color-2);
   border-radius: 3px;
-  z-index: 3;
+  z-index: 5;
 }
 #structureViewContent {
   width: calc( 100% - 8px );
@@ -311,6 +313,27 @@ details > summary {
   height: 100%;
   display: block;
   z-index: 3;
+}
+#structureViewToolbox {
+  position: relative;
+  background-color: transparent;
+  margin: 0.1%;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+.structureViewToolboxButton {
+  color: var(--color-1);
+  font-size: small;
+  border: none;
+  border-radius: 3px;
+  background-color: transparent;
+  margin: 1px;
+  cursor: pointer;
+}
+.structureViewToolboxButton:hover {
+  background-color: var(--color-1-20);
+  transition: 0.3s;
 }
 /* Style for info component */
 #infoComponent {
