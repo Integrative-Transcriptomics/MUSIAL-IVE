@@ -1,6 +1,6 @@
 METAINFO
 VERSION=MUSIALv2.0
-DATE=2022/01/09 13:52:26
+DATE=2022/02/15 12:33:13
 ARGUMENTS
 COMMAND=-o ./examples/treponema_pallidum_pallidum_bamA_Sun/output/ -r ./examples/treponema_pallidum_pallidum_bamA_Sun/reference/NC_021490.2.fasta -a ./examples/treponema_pallidum_pallidum_bamA_Sun/reference/NC_021490.2.gff3 -s ./examples/treponema_pallidum_pallidum_bamA_Sun/sampleSpecification.txt -gf ./examples/treponema_pallidum_pallidum_bamA_Sun/geneSpecification.txt -sf -nt 4MIN_QUALITY=30.0
 MIN_COVERAGE=5.0

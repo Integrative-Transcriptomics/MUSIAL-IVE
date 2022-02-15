@@ -1,4 +1,4 @@
-#date=2022/01/09 13:52:26;source=MUSIALv2.0;reference=bamA;samples=11
+#date=2022/02/15 12:33:13;source=MUSIALv2.0;reference=bamA;samples=11
 Position	Reference	Allele	Samples	Annotation	Annotation_Impact	Gene_Name	Gene_ID	Feature_Type	Feature_ID	Transcript_BioType	Rank	HGVS.c	HGVS.p	cDNA.pos/cDNA.length	CDS.pos/CDS.length	AA.pos/AA.length	Distance	ERRORS/WARNINGS/INFO
 347027	G	A	C3,B3,SHC-0,Q3,P3,SHD-R,K3,SHE-V,A2_2,SHG-I2	synonymous_variant	LOW	bamA	gene-TPANIC_RS01590	transcript	TRANSCRIPT_gene-TPANIC_RS01590	protein_coding	1/1	c.1545G>A	p.Ala515Ala	1545/2514	1545/2514	515/837
 347031	T	G	C3,B3,SHC-0,Q3,P3,SHD-R,K3,SHE-V,A2_2,SHG-I2	missense_variant	MODERATE	bamA	gene-TPANIC_RS01590	transcript	TRANSCRIPT_gene-TPANIC_RS01590	protein_coding	1/1	c.1549T>G	p.Ser517Ala	1549/2514	1549/2514	517/837
