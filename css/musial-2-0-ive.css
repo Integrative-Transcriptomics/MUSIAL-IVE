@@ -227,6 +227,17 @@ details > summary {
   color: var(--color-2);
   border: 1px inset var(--color-4);
 }
+#menuDetails .menuBtnDisabled {
+  cursor: default;
+  background-color: var(--color-1);
+  color: var(--color-2);
+  border: 1px dotted var(--color-1);
+}
+#menuDetails .menuBtnDisabled:hover {
+  background-color: var(--color-1);
+  color: var(--color-2);
+  border: 1px dotted var(--color-1);
+}
 #menuDetails details > summary:hover {
   color: var(--color-2);
 }
