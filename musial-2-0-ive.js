@@ -292,6 +292,9 @@ var STRC_HIGHLIGHTED_REGION = [];
 var STRC_COLOR_SCHEME = "VARIABILITY";
 var STRC_SELECTED_RESIDUES = [];
 var STRC_SHOW_CONTACTS = false; // TODO: Set default to true once PRISMEM15 scores are updated.
+var STRC_SHOW_MEMBRANE = false;
+var STRC_EDITOR_COMPONENTS = [];
+var STRC_EDITOR_TABLE;
 // Variables to store COMC meta-information.
 var COMC_DISPLAYED_POSITION = -1;
 var COMC_SHOW_REFERENCE = false;
@@ -624,7 +627,7 @@ function initSTRC(pdbFile) {
                 INFCSetReferenceInformation(PROTEIN_RESIDUES[sel.chain][sel.resi]["superposition"]);
                 COMCDisplay(PROTEIN_RESIDUES[sel.chain][sel.resi]["superposition"]);
             }
-        );
+        );    
         STRUCTURE_VIEWER.zoomTo();
         STRUCTURE_VIEWER.render();
         STRUCTURE_VIEWER.zoom(0.95, TIMEOUT);
@@ -669,11 +672,115 @@ function initSTRC(pdbFile) {
                 }
             }
         }
+        // Determine discontinuous segments. 
+        STRCcomputeDisconnections( PDB_STRING );
         // Compute hydropathicity for collected residues.
         STRCcomputeScaledKDHydrop();
         // Compute uncertainty for collected residues.
         STRCcomputeVariability();
     };
+}
+
+/**
+ * TODO
+ */
+function STRCcomputeDisconnections( pdbString ) {
+    let computeEuclidean = ( v1, v2 ) => Math.sqrt( Math.pow( v1[ 0 ] - v2[ 0 ], 2 ) + Math.pow( v1[ 1 ] - v2[ 1 ], 2 ) + Math.pow( v1[ 2 ] - v2[ 2 ], 2 ) );
+    let pdbLines = pdbString.split( "\n" );
+    let pdbLine;
+    let pdbLineSplit;
+    let entryId;
+    let atomType;
+    let atomPosition;
+    let previousPosition = [ ];
+    let resi;
+    let distance;
+    for ( pdbLine of pdbLines ) {
+        pdbLineSplit = pdbLine.split( " " ).filter( e => e !== "" );
+        entryId = pdbLineSplit[ 0 ];
+        if ( entryId === 'ATOM' ) {
+            atomType = pdbLineSplit[ 2 ];
+            if ( atomType === 'CA' ) {
+                atomPosition = pdbLineSplit.slice( 6, 9 );
+                if ( atomPosition[ 1 ].split( "." ).length == 3 ) {
+                    let p2Split = atomPosition[ 1 ].split( "." );
+                    let p2_1 = p2Split[ 0 ] + "." + p2Split[ 1 ].slice( 0, 3 );
+                    let p2_2 = p2Split[ 1 ].slice( 3 ) + "." + p2Split[ 2 ]
+                    atomPosition[ 1 ] = p2_1
+                    atomPosition[ 2 ] = p2_2
+                }
+                atomPosition = atomPosition.map( p => parseFloat( p ) );
+                if ( previousPosition.length !== 0 ) {
+                    distance = computeEuclidean( atomPosition, previousPosition );
+                    resi = parseInt( pdbLineSplit[ 5 ] );
+                    if ( distance >= 5 ) {
+                        let rID = (Math.random() + 1).toString(36).substring(8);
+                        while ( STRC_EDITOR_COMPONENTS.filter( cp => cp.id ).includes( rID ) ) {
+                            rID = (Math.random() + 1).toString(36).substring(8);
+                        }
+                        let arrowComponent = {
+                            id: rID,
+                            src: SELECTED_CHAIN + ":" + ( resi - 1 ).toString( ),
+                            tgt: SELECTED_CHAIN + ":" + resi.toString( ),
+                            clr:"#6DE89E",
+                            shape: null,
+                            srcP: previousPosition,
+                            tgtP: atomPosition};
+                        STRCAddArrow( arrowComponent );
+                        STRUCTURE_VIEWER.render( );
+                    }
+                }
+                previousPosition = atomPosition;
+            }
+        }
+    }
+}
+
+/**
+ * TODO
+ */
+function STRCAddArrow( component ) {
+    if ( component.srcP == null ) {
+        let srcAtom = STRUCTURE_VIEWER.getInternalState().models[0].atoms.filter( a =>
+            a.chain == component.src.split( ":" )[ 0 ] && a.resi == component.src.split( ":" )[ 1 ] && a.atom == "CA"
+        )[ 0 ];
+        component.srcP = [ parseFloat( srcAtom.x ), parseFloat( srcAtom.y ), parseFloat( srcAtom.z ) ];
+    }
+    if ( component.tgtP == null  ) {
+        let tgtAtom = STRUCTURE_VIEWER.getInternalState().models[0].atoms.filter( a =>
+            a.chain == component.tgt.split( ":" )[ 0 ] && a.resi == component.tgt.split( ":" )[ 1 ] && a.atom == "CA"
+        )[ 0 ];
+        component.tgtP = [ parseFloat( tgtAtom.x ), parseFloat( tgtAtom.y ), parseFloat( tgtAtom.z ) ];
+    }
+    if ( component.srcP !== null && component.tgtP !== null ) {
+        let shape = STRUCTURE_VIEWER.addArrow( {
+            start: {
+                x: component.srcP[ 0 ],
+                y: component.srcP[ 1 ],
+                z: component.srcP[ 2 ]
+            },
+            end: {
+                x: component.tgtP[ 0 ],
+                y: component.tgtP[ 1 ],
+                z: component.tgtP[ 2 ]
+            },
+            radius: 0.2,
+            mid: 0.9,
+            color: component.clr
+        } );
+        component.shape = shape;
+        STRC_EDITOR_COMPONENTS.push( component );
+        STRUCTURE_VIEWER.render( );
+    }
+}
+
+/**
+ * TODO
+ */
+ function STRCRemoveArrow( component ) {
+    STRUCTURE_VIEWER.removeShape( component.shape );
+    STRC_EDITOR_COMPONENTS = STRC_EDITOR_COMPONENTS.filter( cp => cp.id !== component.id );
+    STRUCTURE_VIEWER.render( );
 }
 
 /**
@@ -941,24 +1048,7 @@ function STRCApplyStyle() {
         { cartoon: STYLES_3DMOL["CARTOON_FADED_" + STRC_COLOR_SCHEME], stick: STYLES_3DMOL.LINE_FADED }
     );
     // Apply membrane style.
-    STRUCTURE_VIEWER.setStyle(
-        {
-            chain: ["x", "y", "z"],
-            resn: "DUM"
-        },
-        {
-            cross: {
-                radius: 0.8,
-                colorfunc: (atom) => {
-                    if (atom.elem == "O") {
-                        return "#a86d71";
-                    } else if (atom.elem == "N") {
-                        return "#6d8ba8";
-                    }
-                }
-            }
-        }
-    );
+    STRCDisplayMembrane( );
     // Apply backbone highlighting.
     STRUCTURE_VIEWER.setStyle(
         {
@@ -1065,6 +1155,43 @@ function STRCDisplayContacts() {
 }
 
 /**
+ * TODO
+ */
+function STRCDisplayMembrane( ) {
+    if (STRC_SHOW_MEMBRANE) {
+        // Apply membrane style.
+        STRUCTURE_VIEWER.setStyle(
+            {
+                chain: ["x", "y", "z"],
+                resn: "DUM"
+            },
+            {
+                cross: {
+                    radius: 0.8,
+                    colorfunc: (atom) => {
+                        if (atom.elem == "O") {
+                            return "#a86d71";
+                        } else if (atom.elem == "N") {
+                            return "#6d8ba8";
+                        }
+                    }
+                }
+            }
+        );
+    } else {
+        // Disable membrane style.
+        STRUCTURE_VIEWER.setStyle(
+            {
+                chain: ["x", "y", "z"],
+                resn: "DUM"
+            },
+            { }
+        );
+    }
+    STRUCTURE_VIEWER.render( );
+}
+
+/**
  * Toggles the option to display contact information.
  */
 function STRCToggleDisplayContacts() {
@@ -1085,6 +1212,22 @@ function STRCToggleDisplayContacts() {
 }
 
 /**
+ * Toggles the option to display contact information.
+ */
+ function STRCToggleDisplayMembrane() {
+    let STRCDisplayMembraneBtn = document.getElementById("menuSTRCDisplayMembraneBtn");
+    if (STRC_SHOW_MEMBRANE) {
+        STRC_SHOW_MEMBRANE = false;
+        STRCDisplayMembrane();
+        STRCDisplayMembraneBtn.classList.remove("menuBtnActive");
+    } else {
+        STRC_SHOW_MEMBRANE = true;
+        STRCDisplayMembrane();
+        STRCDisplayMembraneBtn.classList.add("menuBtnActive");
+    }
+}
+
+/**
  * Expands the structure view component.
  */
 function STRCExpand() {
@@ -1102,6 +1245,83 @@ function STRCCompress() {
     document.getElementById("STRCExpandBtn").onclick = STRCExpand;
     document.getElementById("structureViewComponent").style.width = "51.2%";
     document.getElementById("structureViewComponent").style.height = "51.3%";
+}
+
+/**
+ * TODO
+ */
+ function STRCEditor( ) {
+    Swal.fire({
+        title: '<strong>Structure View Editor</strong>',
+        width: "58%",
+        html: `
+        <div id="structureViewEditor" style="width: 100%; font-size: x-small; padding: 5px; margin: 5px;">
+        </div>
+        `,
+        background: '#EFF0F8',
+        confirmButtonText: '+',
+        confirmButtonColor: '#6BBD5E',
+        preConfirm: () => {
+            // Generate random ID for component.
+            let rID = (Math.random() + 1).toString(36).substring(8);
+            while ( STRC_EDITOR_COMPONENTS.filter( cp => cp.id ).includes( rID ) ) {
+                rID = (Math.random() + 1).toString(36).substring(8);
+            }
+            let data = {
+                id: rID,
+                src: null,
+                tgt: null,
+                clr: "#6DE89E",
+                shape: null,
+                srcP: null,
+                tgtP: null };
+            STRC_EDITOR_TABLE.addData( [
+                data
+            ], true);
+            return false;
+        },
+        showDenyButton: true,
+        denyButtonText: '-',
+        denyButtonColor: '#E05A5A',
+        preDeny: () => {
+            for ( let row of STRC_EDITOR_TABLE.getSelectedRows( ) ) {
+                row.delete( );
+                STRCRemoveArrow( row.getData( ) );
+            }
+            return false;
+        },
+        showCloseButton: true
+    });
+    STRC_EDITOR_TABLE = new Tabulator("#structureViewEditor", {
+        layout: "fitColumns",
+        addRowPos:"bottom",
+        columns:[
+            { formatter: "rowSelection", titleFormatter: "rowSelection", headerSort: false },
+            { title: "ID", field: "id" },
+            { title: "Source", field: "src", editor: "input", cellEdited: e => { _STRCEditorValidateEdit( e, "src" ); } },
+            { title: "Target", field: "tgt", editor: "input", cellEdited: e => { _STRCEditorValidateEdit( e, "tgt" ); } },
+            { title: "Color", field: "clr", editor: "input", cellEdited: e => { _STRCEditorValidateEdit( e, "clr" ); } }
+        ],
+        data: STRC_EDITOR_COMPONENTS
+    });
+}
+
+/**
+ * TODO
+ */
+function _STRCEditorValidateEdit( e, edited ) {
+    let editedComponent = e._cell.row.data;
+    switch ( edited ) {
+        case "src" :
+            editedComponent.srcP = null;
+        case "tgt" :
+            editedComponent.tgtP = null;
+    }
+    STRCRemoveArrow( editedComponent );
+    if ( editedComponent.src !== null && editedComponent.tgt !== null && editedComponent.clr !== null ) {
+        STRCAddArrow( editedComponent );
+    }
+
 }
 
 /**
@@ -2015,8 +2235,8 @@ function initVARC() {
                                 "<p style='text-align: left;'>Theoretical uniform distance: " + ksTestResults.uniformDistance + "</p>" +
                                 "<b style='text-align: center;'>Observed Distances</b><div id='observedDistancesCanvas'></div>",
                             background: '#EFF0F8',
-                            confirmButtonText: 'Ok',
-                            confirmButtonColor: '#607196'
+                            showCloseButton: true,
+                            showConfirmButton: false
                         });
                         var observedDistancesDom = document.getElementById('observedDistancesCanvas');
                         observedDistancesDom.style.height = "300px";
@@ -2604,7 +2824,7 @@ function displayImpressum() {
         </div>
         `,
         background: '#EFF0F8',
-        confirmButtonText: 'Ok',
-        confirmButtonColor: '#607196'
+        showCloseButton: true,
+        showConfirmButton: false
     });
 }
