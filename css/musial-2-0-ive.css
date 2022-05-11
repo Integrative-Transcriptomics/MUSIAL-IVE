@@ -42,7 +42,7 @@
 /*
 [3] Definition of style properties for classes.
 */
-/* Set custom scrollbar design. */
+/* Custom scrollbar design. */
 ::-webkit-scrollbar {
   width: 4px;
   margin-left: 1px;

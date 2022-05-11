@@ -333,6 +333,21 @@ function showElement(elementId, style) {
 }
 
 /**
+ * Shows the specified main subcomponent, i.e. others are closed.
+ * 
+ * @param {Text} componentId
+ */
+ function showMainSubcomponent(componentId) {
+    for (let key of ["about", "visualize", "settings", "imprint"]) {
+        if (componentId === key) {
+            showElement( "main-" + key, "block" );
+        } else {
+            closeElement( "main-" + key );
+        }
+    }
+}
+
+/**
  * Handles the user selection of a directory.
  * 
  * @param {Event} event: A filedrop event. The target of the event has to be a `FileList` instance. 

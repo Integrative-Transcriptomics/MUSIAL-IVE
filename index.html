@@ -5,11 +5,14 @@
         <!-- Meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="description" content="Dashboard for visual analysis of nucleotide variants allocated to protein structures.">
+        <meta name="description" content="Dashboard for visual analysis of nucleotide variants allocated to protein structures. About/Landing page.">
         <meta name="author" content="Simon Hackl">
         <title>MUSIAL IVE</title>
-        <link rel="stylesheet" href="./css//musial-2-0-ive.css">
+        <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+        <!-- <link rel="stylesheet" href="./css//musial-2-0-ive.css"> -->
+        <link rel="stylesheet" href="./css//musial-ive.css">
         <link rel="stylesheet" href="./css//tabulator_semanticui.min.css">
+        <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
         <script type="text/javascript" src="./musial-2-0-ive.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script type="text/javascript" src="https://3Dmol.org/build/3Dmol-min.js"></script>
@@ -36,6 +39,79 @@
         -->
     </head>
     <div id="main">
+        <div data-role="appbar" data-expand-point="md" style="height: var(--appbar-height); background-color: var(--color-1)">
+            <a href="#" class="brand no-hover"><b style="cursor: default; color: var(--background-color)">MUSIAL<sub>2.0</sub><sup>IVE</sup></b></a>
+            <ul class="app-bar-menu">
+                <li><button onclick="showMainSubcomponent('about')" style="color: var(--background-color)" class="no-decoration">About</button></li>
+                <li><button onclick="showMainSubcomponent('visualize')" style="color: var(--background-color)" class="no-decoration">Visualize</button></li>
+                <li><button onclick="showMainSubcomponent('settings')" style="color: var(--background-color)" class="no-decoration">Settings</button></li>
+                <li><a href="https://github.com/Integrative-Transcriptomics/MUSIAL-2.0-IVE" target="_blank" style="color: var(--background-color)" class="no-decoration">Source</a></li>
+                <li><button onclick="showMainSubcomponent('imprint')" style="color: var(--background-color)" class="no-decoration">Imprint</button></li>
+            </ul>
+        </div>
+        <!--
+            About component.
+        -->
+        <div id="main-about" class="main-subcomponent" style="display: block;">
+
+        </div>
+        <!--
+            Visualize component.
+        -->
+        <div id="main-visualize" class="main-subcomponent" style="display: none;">
+
+        </div>
+        <!--
+            Settings component.
+        -->
+        <div id="main-settings" class="main-subcomponent" style="display: none;">
+
+        </div>
+        <!--
+            Imprint component.
+        -->
+        <div id="main-imprint" class="main-subcomponent" style="display: none;">
+            <div style="background: var(--background-color); border-radius: 5px; padding: 1%; text-align: left;">
+                <p><b style="color: var(--color-1)">Used third-party components:</b></p>
+                <div style="margin: 5px; height: 400px; font-size: small; border-radius: 5px; padding: 5px; text-align: left; overflow-y: scroll; background: var(--background-color-3);">
+                    <p>• The visualization of protein structures is based on <a href="https://3dmol.csb.pitt.edu/">3Dmol.js</a></p>
+                    <p>• All other visualization are based on <a href="https://echarts.apache.org/en/index.html">Apache ECharts</a></p>
+                    <p>• Popups are generated with <a href="https://sweetalert2.github.io/">sweetalert2</a></p>
+                    <p>• Statistics are computed with <a href="https://www.npmjs.com/package/jerzy/v/0.2.1?activeTab=readme">jerzy</a></p>
+                    <p>• Internal DOM object handling utilizes <a href="https://jquery.com/">jQuery</a> and <a href="https://www.npmjs.com/package/resize-sensor">resize-sensor</a></p>
+                    <p>• Icons are free-icons from <a href="https://fontawesome.com/">fontawesome</a> or <a href="https://dryicons.com/free-icons/statistic">Dryicons</a></p>
+                    <p>• The loading animation is realized with <a href="https://tobiasahlin.com/spinkit/">Spinkit</a></p>
+                </div>
+            </div>
+            <div style="background: var(--background-color); border-radius: 5px; padding: 1%; text-align: left;">
+                <p><b style="color: var(--color-1)">Information according to § 5 TMG:</b></p>
+                <p style="font-size: x-small;">Simon, Hackl<br>Sand 14<br>72076 Tübingen<br><br>E-Mail: simon.hackl@uni-tuebingen.de</p>
+                <p><b style="color: var(--color-1)">Disclaimer:</b></p>
+                <div style="margin: 5px; height: 250px; font-size: x-small; border-radius: 5px; padding: 5px; text-align: left; overflow-y: scroll; background: var(--background-color-3);">
+                    <p><b>Deutsch</b></p>
+                    <p><u>Haftung für Inhalte:</u></p>
+                    <p>Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.</p>
+                    <p><u>Haftung für Links:</u></p>
+                    <p>Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.</p>
+                    <p><u>Datenschutz:</u></p>
+                    <p>Die Nutzung unserer Webseite ist ohne Angabe personenbezogener Daten möglich und es werden keine verarbeiteten Daten gespeichert. Soweit auf unseren Seiten personenbezogene Daten (beispielsweise Name, Anschrift oder eMail-Adressen) erhoben werden, erfolgt dies, soweit möglich, stets auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche Zustimmung nicht an Dritte weitergegeben. Wir weisen darauf hin, dass die Datenübertragung im Internet (z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich. Der Nutzung von im Rahmen der Impressumspflicht veröffentlichten Kontaktdaten durch Dritte zur Übersendung von nicht ausdrücklich angeforderter Werbung und Informationsmaterialien wird hiermit ausdrücklich widersprochen. Die Betreiber der Seiten behalten sich ausdrücklich rechtliche Schritte im Falle der unverlangten Zusendung von Werbeinformationen, etwa durch Spam-Mails, vor.</p>
+                    <p><u>Urheberrecht:</u></p>
+                    <p>Dieses Programm ist freie Software: Sie können es unter den Bedingungen der GNU General Public License, wie sie von der Free Software Foundation veröffentlicht wurde, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder (nach Ihrer Wahl) jeder späteren Version. Dieses Programm wird in der Hoffnung verteilt, dass es nützlich ist, aber OHNE JEGLICHE GARANTIE; sogar ohne die implizite Garantie der MARKTREIFE oder der EIGNUNG FÜR EINEN BESTIMMTEN ZWECK.  Siehe die GNU General Public License für weitere Details (<a href="http://www.gnu.org/licenses">http://www.gnu.org/licenses</a>)</p>
+                    <p></p>
+                    <p><b>English</b></p>
+                    <p><u>Content liability:</u></p>
+                    <p>The contents of our pages were created with the utmost care. However, we cannot guarantee the accuracy, completeness and actuality of the content. As a service provider, we are responsible for our own content on these pages under the general laws according to § 7 para.1 TMG. According to §§ 8 to 10 TMG, however, we are not obligated as a service provider to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity. Obligations to remove or block the use of information under the general laws remain unaffected. However, liability in this regard is only possible from the point in time at which a concrete infringement of the law becomes known. If we become aware of such infringements, we will remove this content immediately.</p>
+                    <p><u>Link liability:</u></p>
+                    <p>This page may contain links to external websites of third parties, on whose contents we have no influence. We cannot take any liability for these external contents. The respective provider or operator of the pages is always responsible for the content of the linked pages. The linked pages were checked for possible legal violations at the time of linking. Illegal contents were not recognizable at the time of linking. However, a permanent control of the contents of the linked pages is not reasonable without concrete evidence of a violation of the law. If we become aware of any infringements, we will remove such links immediately.</p>
+                    <p><u>Data privacy:</u></p>
+                    <p>The use of our website is possible without providing personal data and no processed data is stored. As far as on our sides personal data (such as name, address or e-mail addresses) are collected, this is on a voluntary basis. This data will not be passed on to third parties without your express consent. We point out that data transmission over the Internet (eg communication by e-mail) may yield security gaps. Complete protection of data against access by third parties is not possible. The use of contact data published within the framework of the impressum by third parties for the purpose of sending advertising and information material is hereby expressly prohibited. The operators of the pages expressly reserve the right to take legal action in the event of the sending of advertising information, such as spam e-mails.</p>
+                    <p><u>Copyright :</u></p>
+                    <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. (<a href="http://www.gnu.org/licenses">http://www.gnu.org/licenses</a>)</p>
+                </div>
+            </div>
+        </div>
+
+        <!--
         <div id="headerMenu">
             <details>
                 <summary id="menuBtn"><i class="fas fa-bars"></i></summary>
@@ -53,7 +129,6 @@
                                 <div>
                                     <button id="menuVARCAmbiguityModeSelectMaskBtn" onclick="VARCSetAmbiguityMode('MASK')" class="menuBtnActive">Mask</button>
                                     <button id="menuVARCAmbiguityModeSelectShowBtn" onclick="VARCSetAmbiguityMode('SHOW')">Show</button>
-                                    <!-- <button id="menuVARCAmbiguityModeSelectHideBtn" onclick="VARCSetAmbiguityMode('HIDE')">Hide</button> -->
                                 </div>
                             </details>
                             <details>
@@ -94,7 +169,6 @@
                                 <summary id="menuCOMCDisplay">&nbsp;&nbsp;┗&nbsp;Display</summary>
                                 <div>
                                     <button id="menuCOMCDisplayReferenceBtn" onclick="COMCToggleDisplayReference()">Ref. Content</button>
-                                    <!--<button>Terminals</button>-->
                                 </div>
                             </details>
                         </div>
@@ -149,6 +223,7 @@
             </div>
         </div>
         <button id="imprintButton" onclick="displayImpressum()"><b>Impressum</b></button>
+        -->
     </div>
 </body>
 </html>

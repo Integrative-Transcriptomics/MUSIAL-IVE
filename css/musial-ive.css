@@ -1,0 +1,94 @@
+/**
+    MUSIAL-IVE
+    Author: Simon Hackl
+    Contact: simon.hackl@uni-tuebingen.de
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/*
+[1] Imports
+*/
+/*
+[2] Definition of root properties and variables.
+*/
+:root {
+  font-family: Arial, Helvetica, sans-serif, 'Genos';
+  --background-color: #EFF0F8;
+  --background-color-2: #E4E5ED;
+  --background-color-3: #fafafc;
+  --color-1: #607196;
+  --color-2: #cbd0e0;
+  --color-3: #81A4CD;
+  --color-4: #6d81ad;
+  --focus-color: #dde9ff;
+  --error-color: hsla(0, 99%, 64%, 0.8);
+  --appbar-height: 5.5%;
+}
+/*
+[3] Definition of style properties for classes.
+*/
+/* Custom scrollbar design. */
+::-webkit-scrollbar {
+  width: 4px;
+  margin-left: 1px;
+  margin-bottom: 1px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background-color-2);
+  margin-left: 1px;
+  margin-bottom: 1px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-2);
+  margin: 1px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-1);
+}
+.no-decoration {
+  background-color: transparent;
+  border: none;
+  color: var(--background-color-2);
+  font-size: small;
+}
+.no-decoration:hover {
+  background-color: transparent;
+  border: none;
+  color: var(--background-color);
+  cursor: pointer;
+  font-size: small;
+}
+.no-decoration:focus {
+  background-color: transparent;
+  border: none;
+  text-shadow: 0px 0px 1px var(--background-color);
+  font-size: small;
+}
+.main-subcomponent {
+  position: fixed;
+  top: 5.5%;
+  left: 0;
+  width: 100%;
+  height: 94.5%;
+  background-color: var(--background-color);
+}
+/*
+[4] Definition of style properties for components via their id.
+*/
+#main {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--background-color);
+}
