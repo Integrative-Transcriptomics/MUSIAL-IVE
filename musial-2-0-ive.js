@@ -177,9 +177,9 @@ var VARIABILITY_COLOR_LIST = [...Array(101).keys()].map(value => {
     if (value == 0) {
         return "rgb(200,200,200)";
     } else {
-        let c1 = Math.round(230 - (((230 - 115) / 100) * (value - 1)));
-        let c2 = Math.round(169 - ((169 / 100) * (value - 1)));
-        let c3 = Math.round(27 + (((255 - 27) / 100) * (value - 1)));
+        let c1 = Math.round(100 - (((100 - 41) / 100) * (value - 1)));
+        let c2 = Math.round(0 + ((203 / 100) * (value - 1)));
+        let c3 = Math.round(206 - (((206 - 57) / 100) * (value - 1)));
         return "rgb(" + c1 + "," + c2 + "," + c3 + ")";
     }
 });
@@ -853,11 +853,11 @@ function STRCcomputeVariability() {
 function STRCcomputeVariabilityColor(chain, resi) {
     let value = PROTEIN_RESIDUES[chain][resi]["variability"] * 100;
     if (value == 0) {
-        return "rgb(200,200,200)";
+        return "rgb(255,255,255)";
     } else {
-        let c1 = Math.round(230 - (((230 - 115) / 100) * (value - 1)));
-        let c2 = Math.round(169 - ((169 / 100) * (value - 1)));
-        let c3 = Math.round(27 + (((255 - 27) / 100) * (value - 1)));
+        let c1 = Math.round(100 - (((100 - 41) / 100) * (value - 1)));
+        let c2 = Math.round(0 + ((203 / 100) * (value - 1)));
+        let c3 = Math.round(206 - (((206 - 57) / 100) * (value - 1)));
         return "rgb(" + c1 + "," + c2 + "," + c3 + ")";
     }
 }
