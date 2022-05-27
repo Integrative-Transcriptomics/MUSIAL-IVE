@@ -2,28 +2,29 @@
 <html>
 <body>
     <head>
-        <!-- Meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="description" content="Dashboard for visual analysis of nucleotide variants allocated to protein structures. About/Landing page.">
         <meta name="author" content="Simon Hackl">
+        
         <title>MUSIAL IVE</title>
+        
         <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
-        <!-- <link rel="stylesheet" href="./css//musial-2-0-ive.css"> -->
         <link rel="stylesheet" href="./css//musial-ive.css">
         <link rel="stylesheet" href="./css//tabulator_semanticui.min.css">
+
+        <script type="text/javascript" src="./musial-ive.js"></script>
         <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
-        <script type="text/javascript" src="./musial-2-0-ive.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script type="text/javascript" src="https://3Dmol.org/build/3Dmol-min.js"></script>
-        <script type="text/javascript" src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" data-auto-replace-svg="nest"></script>
+        <script src="https://kit.fontawesome.com/3efd018578.js" crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/resize-sensor@0.0.6/ResizeSensor.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.1.0/dist/echarts.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.1.8/js/tabulator.min.js"></script>
         <script type="text/javascript" src="./scripts/jerzy.js"></script>
         <!--
-        MUSIAL-v2.0-IVE
+        MUSIAL-IVE v2.0
         Author: Simon Hackl
         Contact: simon.hackl@uni-tuebingen.de
         This program is free software: you can redistribute it and/or modify
@@ -40,40 +41,73 @@
     </head>
     <div id="main">
         <div data-role="appbar" data-expand-point="md" style="height: var(--appbar-height); background-color: var(--color-1)">
-            <a href="#" class="brand no-hover"><b style="cursor: default; color: var(--background-color)">MUSIAL<sub>2.0</sub><sup>IVE</sup></b></a>
+            <a href="#" class="brand no-hover"><b style="cursor: default; color: var(--background-color)">MUSIAL<sup>IVE</sup> <sub>v2.0</sub></b></a>
             <ul class="app-bar-menu">
-                <li><button onclick="showMainSubcomponent('about')" style="color: var(--background-color)" class="no-decoration">About</button></li>
-                <li><button onclick="showMainSubcomponent('visualize')" style="color: var(--background-color)" class="no-decoration">Visualize</button></li>
-                <li><button onclick="showMainSubcomponent('settings')" style="color: var(--background-color)" class="no-decoration">Settings</button></li>
-                <li><a href="https://github.com/Integrative-Transcriptomics/MUSIAL-2.0-IVE" target="_blank" style="color: var(--background-color)" class="no-decoration">Source</a></li>
-                <li><button onclick="showMainSubcomponent('imprint')" style="color: var(--background-color)" class="no-decoration">Imprint</button></li>
+                <li><button onclick="toggleMainSubcomponent('about')" style="color: var(--background-color)" class="no-decoration" disabled>About</button></li>
+                <li><button onclick="toggleMainSubcomponent('visualize_overview')" style="color: var(--background-color)" class="no-decoration">Visualize</button></li>
+                <li><button onclick="toggleMainSubcomponent('settings')" style="color: var(--background-color)" class="no-decoration">Settings</button></li>
+                <li><button onclick="toggleMainSubcomponent('legal_notice')" style="color: var(--background-color)" class="no-decoration">Legal Notice</button></li>
+                <li><a href="https://github.com/Integrative-Transcriptomics/MUSIAL-2.0-IVE" target="_blank" style="font-size: large; color: var(--background-color)" class="no-decoration"><i class="fa-brands fa-github"></i></a></li>
             </ul>
         </div>
         <!--
             About component.
         -->
-        <div id="main-about" class="main-subcomponent" style="display: block;">
+        <div id="main-about" class="main-subcomponent" style="display: none;">
 
         </div>
         <!--
             Visualize component.
         -->
-        <div id="main-visualize" class="main-subcomponent" style="display: none;">
-
+        <div id="main-visualize_overview" class="main-subcomponent" style="display: block; padding: 10px">
+            <input type="file" class="w-25" style="z-index: 2; cursor: pointer; position: absolute; top: 0; left: 0;" data-role="file" data-prepend='<p style="color: var(--color-1)">Add Features</p>' data-button-title='<i class="fa-solid fa-file-circle-plus" style="font-size: x-large; color: var(--color-1)"></i>' onchange="fileInputChange(event)"/>
+            <button id="main-visualize_overview_explore_genotype_button" class="button light" style="color: var(--color-1); position: absolute; top: 10px; left: 25%; margin-left: 10px;" disabled><i class="fa-solid fa-dna"></i>&nbsp;Explore Genotypes</button>
+            <button id="main-visualize_overview_explore_proteoform_button" class="button light" style="color: var(--color-1); position: absolute; top: 10px; left: calc(25% + 167.5px); margin-left: 10px;" onclick="toggleMainSubcomponent('visualize_proteoforms');PROTEIN_STRUCTURE_VIEWER_setSelectedFeature();" disabled><i class="fa-solid fa-disease"></i>&nbsp;Explore Proteoforms</button>
+            <button class="button light" style="color: var(--error-color); position: absolute;top: 10px; margin-left: 10px; margin-right: 10px; right: 136.5px;" disabled><i class="fa-solid fa-trash"></i>&nbsp;Clear Project</button>
+            <button class="button light" style="color: var(--color-1); position: absolute; top: 10px; right: 10px;" disabled><i class="fa-solid fa-file-arrow-down"></i>&nbsp;Export Project</button>
+            <div id="main-visualize_overview_feature_selection_echart_container" style="position: absolute; top: 50px; background-color: transparent; width: 100%; height: calc( 100% - 70px );"></div>
+        </div>
+        <div id="main-visualize_proteoforms" class="main-subcomponent" style="display: none; padding: 10px">
+            <button id="main-visualize_proteoforms_back_button" class="button light" style="z-index: 2; color: var(--color-1); position: absolute; top: 10px; left: 10px; margin-left: 10px;" onclick="toggleMainSubcomponent('visualize_overview')"><i style="font-size: large;" class="fas fa-caret-left"></i>&nbsp;Back</button>
+            <b id="main-visualize_proteoforms_selected_feature_name" style="z-index: 2; padding: 2px; color: var(--color-1); position: absolute; top: 16px; left: 85px; margin-left: 10px; background-color: white; border: 1px solid #E4E5ED; border-radius: 1px;"></b>
+            <div id="main-visualize_proteoforms_structure_viewer_3dmol_container" style="position: absolute; top: 10px; background-color: var(--color-3); width: calc( 100% - 20px ); height: calc( 50% - 20px );"></div>
+            <div id="main-visualize_proteoforms_variants_viewer_echart_container" style="position: absolute; top: 50%; background-color: #fe4848; width: calc( 100% - 20px ); height: calc( 50% - 20px );"></div>
         </div>
         <!--
             Settings component.
         -->
-        <div id="main-settings" class="main-subcomponent" style="display: none;">
-
+        <div id="main-settings" class="main-subcomponent" style="display: none; padding: 10px;">
+            <input type="file" class="w-25" style="cursor: pointer;" data-role="file" data-prepend='<p style="color: var(--color-1)">Import Settings</p>' data-button-title='<i class="fa-solid fa-file-arrow-up" style="font-size: x-large; color: var(--color-1)"></i>' data-on-select="console.log(files, element)">
+            <button class="button light" style="color: var(--color-1); position: absolute; top: 10px; left: calc(25% + 20px); margin-left: 10px;"><i class="fa-solid fa-file-arrow-down"></i>&nbsp;Export Settings</button>
+            <br style="content: ''; margin: 10px 0; display: block;">
+            <table class="table row-border" data-role="table" data-rows="10" data-show-pagination="true" data-show-table-info="false" data-show-rows-steps="false" data-show-search="true" data-table-search-title='<p style="color: var(--color-1);">Browse by Name</p>' data-search-min-length="3" data-search-threshold="60" data-search-fields="Name">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i style="color: var(--color-4)" class="fa-solid fa-palette"></i></td>
+                        <td>Protein Structure Surface Color</td>
+                        <td>
+                            <input type="color">
+                        </td>
+                        <td>The color to ...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <!--
-            Imprint component.
+            Legal notice component.
         -->
-        <div id="main-imprint" class="main-subcomponent" style="display: none;">
-            <div style="background: var(--background-color); border-radius: 5px; padding: 1%; text-align: left;">
-                <p><b style="color: var(--color-1)">Used third-party components:</b></p>
-                <div style="margin: 5px; height: 400px; font-size: small; border-radius: 5px; padding: 5px; text-align: left; overflow-y: scroll; background: var(--background-color-3);">
+        <div id="main-legal_notice" class="main-subcomponent" style="display: none; overflow-y: auto;">
+            <div style="height: 380px; background: var(--background-color); border-radius: 5px; padding: 5px; margin: 5px; text-align: left;">
+                <p><b style="height: 5%; color: var(--color-1)">Third-Party Frameworks and Libraries:</b></p>
+                <div style="height: 95%; font-size: small; border-radius: 5px; margin: 5px; padding: 5px; text-align: left; overflow-y: auto; background: var(--background-color-3);">
                     <p>• The visualization of protein structures is based on <a href="https://3dmol.csb.pitt.edu/">3Dmol.js</a></p>
                     <p>• All other visualization are based on <a href="https://echarts.apache.org/en/index.html">Apache ECharts</a></p>
                     <p>• Popups are generated with <a href="https://sweetalert2.github.io/">sweetalert2</a></p>
@@ -83,11 +117,10 @@
                     <p>• The loading animation is realized with <a href="https://tobiasahlin.com/spinkit/">Spinkit</a></p>
                 </div>
             </div>
-            <div style="background: var(--background-color); border-radius: 5px; padding: 1%; text-align: left;">
-                <p><b style="color: var(--color-1)">Information according to § 5 TMG:</b></p>
-                <p style="font-size: x-small;">Simon, Hackl<br>Sand 14<br>72076 Tübingen<br><br>E-Mail: simon.hackl@uni-tuebingen.de</p>
-                <p><b style="color: var(--color-1)">Disclaimer:</b></p>
-                <div style="margin: 5px; height: 250px; font-size: x-small; border-radius: 5px; padding: 5px; text-align: left; overflow-y: scroll; background: var(--background-color-3);">
+            <div style="height: 550px; background: var(--background-color); border-radius: 5px; padding: 5px; margin: 5px; text-align: left;">
+                <p><b style="height: 5%; color: var(--color-1);">Disclaimer:</b></p>
+                <div style="height: 70%; font-size: x-small; border-radius: 5px; margin: 5px; padding: 5px; text-align: left; overflow-y: auto; background: var(--background-color-3);">
+                    <!--
                     <p><b>Deutsch</b></p>
                     <p><u>Haftung für Inhalte:</u></p>
                     <p>Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.</p>
@@ -99,6 +132,7 @@
                     <p>Dieses Programm ist freie Software: Sie können es unter den Bedingungen der GNU General Public License, wie sie von der Free Software Foundation veröffentlicht wurde, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder (nach Ihrer Wahl) jeder späteren Version. Dieses Programm wird in der Hoffnung verteilt, dass es nützlich ist, aber OHNE JEGLICHE GARANTIE; sogar ohne die implizite Garantie der MARKTREIFE oder der EIGNUNG FÜR EINEN BESTIMMTEN ZWECK.  Siehe die GNU General Public License für weitere Details (<a href="http://www.gnu.org/licenses">http://www.gnu.org/licenses</a>)</p>
                     <p></p>
                     <p><b>English</b></p>
+                    -->
                     <p><u>Content liability:</u></p>
                     <p>The contents of our pages were created with the utmost care. However, we cannot guarantee the accuracy, completeness and actuality of the content. As a service provider, we are responsible for our own content on these pages under the general laws according to § 7 para.1 TMG. According to §§ 8 to 10 TMG, however, we are not obligated as a service provider to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity. Obligations to remove or block the use of information under the general laws remain unaffected. However, liability in this regard is only possible from the point in time at which a concrete infringement of the law becomes known. If we become aware of such infringements, we will remove this content immediately.</p>
                     <p><u>Link liability:</u></p>
@@ -108,80 +142,12 @@
                     <p><u>Copyright :</u></p>
                     <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. (<a href="http://www.gnu.org/licenses">http://www.gnu.org/licenses</a>)</p>
                 </div>
+                <p><b style="height: 5%; color: var(--color-1);">Contact Information According to § 5 TMG:</b></p>
+                <p style="font-size: x-small; margin: 5px; padding: 5px;">Simon, Hackl<br>Sand 14<br>72076 Tübingen, Germany<br>simon.hackl@uni-tuebingen.de</p>
             </div>
         </div>
 
         <!--
-        <div id="headerMenu">
-            <details>
-                <summary id="menuBtn"><i class="fas fa-bars"></i></summary>
-                <div id="menuDetails">
-                    <details>
-                        <summary id="menuVARC">&nbsp;Variants View</summary>
-                        <div>
-                            <details>
-                                <summary id="menuVARCChainSelect">&nbsp;&nbsp;┗&nbsp;View Chain</summary>
-                                <div id="menuVARCChainSelectContent" >
-                                </div>
-                            </details>
-                            <details>
-                                <summary id="menuVARCAmbiguityModeSelect">&nbsp;&nbsp;┗&nbsp;Ambiguity Mode</summary>
-                                <div>
-                                    <button id="menuVARCAmbiguityModeSelectMaskBtn" onclick="VARCSetAmbiguityMode('MASK')" class="menuBtnActive">Mask</button>
-                                    <button id="menuVARCAmbiguityModeSelectShowBtn" onclick="VARCSetAmbiguityMode('SHOW')">Show</button>
-                                </div>
-                            </details>
-                            <details>
-                                <summary id="menuVARCAggregationModeSelect">&nbsp;&nbsp;┗&nbsp;Aggregate By</summary>
-                                <div>
-                                    <button id="menuVARCAggregationModeSelectSampleBtn" onclick="VARCSetAggregationMode('SAMPLE')">Sample</button>
-                                    <button id="menuVARCAggregationModeSelectGenotypeBtn" onclick="VARCSetAggregationMode('GENOTYPE')">Genotype</button>
-                                    <button id="menuVARCAggregationModeSelectProteoformBtn" onclick="VARCSetAggregationMode('PROTEOFORM')" class="menuBtnActive">Proteoform</button>
-                                </div>
-                            </details>
-                        </div>
-                    </details>
-                    <hr>
-                    <details>
-                        <summary id="menuVARC">&nbsp;Structure View</summary>
-                        <div>
-                            <details>
-                                <summary id="menuSTRCColors">&nbsp;&nbsp;┗&nbsp;Color By</summary>
-                                <div>
-                                    <button id="menuSTRCColorVariabilityBtn" onclick="STRCSetColorScheme('VARIABILITY')" class="menuBtnActive">Variability</button>
-                                    <button id="menuSTRCColorHydropathicityBtn" onclick="STRCSetColorScheme('HYDROPATHICITY')">Hydropathicity</button>
-                                </div>
-                            </details>
-                            <details>
-                                <summary id="menuSTRCDisplay">&nbsp;&nbsp;┗&nbsp;Display</summary>
-                                <div>
-                                    <button id="menuSTRCDisplayContactsBtn" onclick="STRCToggleDisplayContacts()" class="menuBtnDisabled">Contacts</button>
-                                    <button id="menuSTRCDisplayMembraneBtn" onclick="STRCToggleDisplayMembrane()" class="">Membrane</button>
-                                </div>
-                            </details>
-                        </div>
-                    </details>
-                    <hr>
-                    <details>
-                        <summary id="menuCOMC">&nbsp;Composition View</summary>
-                        <div>
-                            <details>
-                                <summary id="menuCOMCDisplay">&nbsp;&nbsp;┗&nbsp;Display</summary>
-                                <div>
-                                    <button id="menuCOMCDisplayReferenceBtn" onclick="COMCToggleDisplayReference()">Ref. Content</button>
-                                </div>
-                            </details>
-                        </div>
-                    </details>
-                </div>
-            </details>
-            <a id="gitHubLink" href="https://github.com/Integrative-Transcriptomics/MUSIAL-2.0-IVE" target="_blank">
-                <i class="fab fa-github-square"></i>
-            </a>
-            <div id="title">
-                <b style = "color: var(--background-color)">MUSIAL<sup>2.0</sup><sub>IVE</sub></b>
-            </div>
-        </div>
         <div id="inputComponent">
             <i id="directoryInputIcon" class="fas fa-folder-open"></i>
             <br>
