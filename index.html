@@ -12,17 +12,20 @@
         <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
         <link rel="stylesheet" href="./css//musial-ive.css">
         <link rel="stylesheet" href="./css//tabulator_semanticui.min.css">
+        <link rel="stylesheet" href="./css//contextual.css">
+        <link rel="stylesheet" href="./css//contextual.theme.css">
 
         <script type="text/javascript" src="./musial-ive.js"></script>
-        <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
+        <script type="text/javascript" src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script type="text/javascript" src="https://3Dmol.org/build/3Dmol-min.js"></script>
-        <script src="https://kit.fontawesome.com/3efd018578.js" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://kit.fontawesome.com/3efd018578.js" crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/resize-sensor@0.0.6/ResizeSensor.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.1.0/dist/echarts.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.1.8/js/tabulator.min.js"></script>
         <script type="text/javascript" src="./scripts/jerzy.js"></script>
+        <script type="text/javascript" src="./scripts/contextual.js"></script>
         <!--
         MUSIAL-IVE v2.0
         Author: Simon Hackl
@@ -61,16 +64,14 @@
         -->
         <div id="main-visualize_overview" class="main-subcomponent" style="display: block; padding: 10px">
             <input type="file" class="w-25" style="z-index: 2; cursor: pointer; position: absolute; top: 0; left: 0;" data-role="file" data-prepend='<p style="color: var(--color-1)">Add Features</p>' data-button-title='<i class="fa-solid fa-file-circle-plus" style="font-size: x-large; color: var(--color-1)"></i>' onchange="fileInputChange(event)"/>
-            <button id="main-visualize_overview_explore_genotype_button" class="button light" style="color: var(--color-1); position: absolute; top: 10px; left: 25%; margin-left: 10px;" disabled><i class="fa-solid fa-dna"></i>&nbsp;Explore Genotypes</button>
-            <button id="main-visualize_overview_explore_proteoform_button" class="button light" style="color: var(--color-1); position: absolute; top: 10px; left: calc(25% + 167.5px); margin-left: 10px;" onclick="toggleMainSubcomponent('visualize_proteoforms');PROTEIN_STRUCTURE_VIEWER_setSelectedFeature();" disabled><i class="fa-solid fa-disease"></i>&nbsp;Explore Proteoforms</button>
-            <button class="button light" style="color: var(--error-color); position: absolute;top: 10px; margin-left: 10px; margin-right: 10px; right: 136.5px;" disabled><i class="fa-solid fa-trash"></i>&nbsp;Clear Project</button>
-            <button class="button light" style="color: var(--color-1); position: absolute; top: 10px; right: 10px;" disabled><i class="fa-solid fa-file-arrow-down"></i>&nbsp;Export Project</button>
-            <div id="main-visualize_overview_feature_selection_echart_container" style="position: absolute; top: 50px; background-color: transparent; width: 100%; height: calc( 100% - 70px );"></div>
+            <button class="button light" style="color: var(--color-1); position: absolute; top: 10px; right: 156.5px;" disabled><i class="fa-solid fa-file-arrow-down"></i>&nbsp;Export Project</button>
+            <button class="button light" style="color: var(--error-color); position: absolute;top: 10px; margin-left: 10px; margin-right: 10px; right: 10px;" disabled><i class="fa-solid fa-trash"></i>&nbsp;Clear Project</button>
+            <div id="main-visualize_overview_feature_selection_echart_container" style="border: 1px solid #E4E5ED; position: absolute; top: 50px; background-color: var(--background-color-3); width: calc(100% - 20px); height: calc( 100% - 70px );"></div>
         </div>
         <div id="main-visualize_proteoforms" class="main-subcomponent" style="display: none; padding: 10px">
-            <button id="main-visualize_proteoforms_back_button" class="button light" style="z-index: 2; color: var(--color-1); position: absolute; top: 10px; left: 10px; margin-left: 10px;" onclick="toggleMainSubcomponent('visualize_overview')"><i style="font-size: large;" class="fas fa-caret-left"></i>&nbsp;Back</button>
-            <b id="main-visualize_proteoforms_selected_feature_name" style="z-index: 2; padding: 2px; color: var(--color-1); position: absolute; top: 16px; left: 85px; margin-left: 10px; background-color: white; border: 1px solid #E4E5ED; border-radius: 1px;"></b>
-            <div id="main-visualize_proteoforms_structure_viewer_3dmol_container" style="position: absolute; top: 10px; background-color: var(--color-3); width: calc( 100% - 20px ); height: calc( 50% - 20px );"></div>
+            <button id="main-visualize_proteoforms_back_button" class="button light" style="z-index: 2; color: var(--color-1); position: absolute; top: 20px; left: 10px; margin-left: 10px;" onclick="toggleMainSubcomponent('visualize_overview')"><i style="font-size: large;" class="fas fa-caret-left"></i>&nbsp;Back</button>
+            <div id="main-visualize_proteoforms_selected_feature_name" style="z-index: 2; font-size: 11; padding: 6px; color: var(--color-1); position: absolute; top: 20px; left: 85px; height: 36px; margin-left: 10px; text-align: center; background-color: transparent;"></div>
+            <div id="main-visualize_proteoforms_structure_viewer_3dmol_container" style="position: absolute; top: 10px; border: 1px solid #E4E5ED; background-color: var(--background-color-3); width: calc( 100% - 20px ); height: calc( 50% - 20px );"></div>
             <div id="main-visualize_proteoforms_variants_viewer_echart_container" style="position: absolute; top: 50%; background-color: #fe4848; width: calc( 100% - 20px ); height: calc( 50% - 20px );"></div>
         </div>
         <!--
@@ -90,14 +91,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <!--
+                        <tr>
                         <td><i style="color: var(--color-4)" class="fa-solid fa-palette"></i></td>
                         <td>Protein Structure Surface Color</td>
                         <td>
                             <input type="color">
                         </td>
                         <td>The color to ...</td>
-                    </tr>
+                        </tr>
+                    -->
                 </tbody>
             </table>
         </div>

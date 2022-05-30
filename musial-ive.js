@@ -30,32 +30,35 @@ var STATE = {
     "selectedFeature": null,
     "featureOverviewEchartOption": {
         title: {
-            text: 'No Feature Selected',
-            bottom: '0',
-            left: 'auto',
+            text: 'Leaf Node Color | Feature Variable Positions',
+            bottom: '5%',
+            right: 'center',
             textStyle: {
                 color: '#607196',
                 fontSize: 14
+            }
+        },
+        toolbox: {
+            feature: {
+
             },
-            backgroundColor: '#FFFFFF',
-            borderColor: '#E4E5ED',
-            borderWidth: 1,
-            borderRadius: 1
+            bottom: '2%',
+            left: '1%'
         },
         visualMap: {
             min: -1,
             max: 50,
             range: [0, 50],
-            dimension: 1,
+            dimension: 0,
             seriesIndex: 0,
             hoverLink: true,
             inverse: false,
-            orient: 'vertical',
-            itemHeight: 800,
-            bottom: 'center',
+            orient: 'horizontal',
+            itemHeight: 1000,
+            bottom: '2%',
             align: 'left',
-            right: 20,
-            text: ['≥50% Variable Positions', '0% Variable Positions'],
+            right: 'center',
+            text: ['≥ 50%', '0%'],
             textStyle: {
                 color: '#607196',
                 fontSize: 12
@@ -77,64 +80,22 @@ var STATE = {
         },
         series: [
             {
-                type: 'sunburst',
-                radius: ['15%', '95%'],
-                nodeClick: 'false',
-                emphasis: {
-                    focus: 'ancestor'
+                type: 'tree',
+                symbol: 'diamond',
+                symbolSize: 32,
+                edgeShape: 'curve',
+                roam: true,
+                expandAndCollapse: true,
+                initalTreeDepth: 2,
+                right: '10%',
+                left: '10%',
+                label: {
+                    position: 'right',
+                    fontWeight: 'bold',
+                    fontSize: 11,
+                    textBorderColor: '#EFF0F8',
+                    textBorderWidth: 2
                 },
-                levels: [
-                    {
-
-                    },
-                    {
-                        label: {
-                            color: '#EFF0F8',
-                            rotate: 'tangential'
-                        },
-                        itemStyle: {
-                            borderWidth: 4,
-                            borderColor: '#EFF0F8',
-                            color: '#6d81ad'
-                        },
-                        emphasis: {
-                            itemStyle: {
-                                borderColor: '#FAFAFAC'
-                            }
-                        }
-                    },
-                    {
-                        label: {
-                            color: '#EFF0F8',
-                            rotate: 'radial'
-                        },
-                        itemStyle: {
-                            borderWidth: 4,
-                            borderColor: '#EFF0F8',
-                            color: '#81A4CD'
-                        },
-                        emphasis: {
-                            itemStyle: {
-                                borderColor: '#FAFAFAC'
-                            }
-                        }
-                    },
-                    {
-                        label: {
-                            color: '#EFF0F8',
-                            rotate: 'radial'
-                        },
-                        itemStyle: {
-                            borderWidth: 4,
-                            borderColor: '#EFF0F8'
-                        },
-                        emphasis: {
-                            itemStyle: {
-                                borderColor: '#FAFAFAC'
-                            }
-                        }
-                    }
-                ],
                 data: []
             }
         ]
@@ -153,26 +114,28 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
     if (featureOverviewData.filter(node => node.name == chr).length == 0) {
         chrLevelNode = {
             name: chr,
-            value: [1, -1],
+            value: -1,
+            symbol: 'emptyCircle',
+            symbolSize: 12,
             children: []
         };
         featureOverviewData.push(chrLevelNode);
     } else {
         chrLevelNode = featureOverviewData.filter(node => node.name === chr)[0];
-        chrLevelNode.value = [chrLevelNode.value[0] + 1, -1];
     }
 
     if (chrLevelNode.children.filter(node => node.name === cls).length == 0) {
         clsLevelNode = {
             name: cls,
-            value: [1, -1],
+            value: -1,
+            symbol: 'emptyCircle',
+            symbolSize: 12,
             children: []
         };
         STATE.featureOverviewEchartOption.clsLevelTotal += 1;
         chrLevelNode.children.push(clsLevelNode);
     } else {
         clsLevelNode = chrLevelNode.children.filter(node => node.name === cls)[0];
-        clsLevelNode.value = [clsLevelNode.value[0] + 1, -1];
     }
 
     if (clsLevelNode.children.filter(node => node.name === ftr).length == 0) {
@@ -187,7 +150,8 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
         let variability = value / (ftrEnd - ftrStart + 1);
         ftrLevelNode = {
             name: ftr,
-            value: [1, Math.min(100, Math.round(variability * 100))]
+            value: Math.min(100, Math.round(variability * 100)),
+            symbol: 'path://M.1193 494.1c-1.125 9.5 6.312 17.87 15.94 17.87l32.06 .0635c8.125 0 15.21-5.833 16.21-13.83c.7501-4.875 1.869-11.17 3.494-18.17h312c1.625 6.875 2.904 13.31 3.529 18.18c1.125 7.1 7.84 13.94 15.97 13.82l32.46-.0625c9.625 0 17.12-8.374 15.99-17.87c-4.625-37.87-25.75-128.1-119.1-207.7c-17.5 12.37-36.98 24.37-58.48 35.49c6.25 4.625 11.56 9.405 17.06 14.15H159.7c21.25-18.12 47.03-35.63 78.65-51.38c172.1-85.5 203.7-218.8 209.5-266.7c1.125-9.5-6.297-17.88-15.92-17.88L399.6 .001c-8.125 0-14.84 5.832-15.96 13.83c-.7501 4.875-1.869 11.17-3.369 18.17H67.74C66.24 25 65.08 18.81 64.33 13.81C63.21 5.813 56.48-.124 48.36 .001L16.1 .1338c-9.625 0-17.09 8.354-15.96 17.85c5.125 42.87 31.29 153.8 159.9 238.1C31.55 340.3 5.245 451.2 .1193 494.1zM223.9 219.7C198.8 205.9 177.6 191.3 159.7 176h128.5C270.4 191.3 249 206.1 223.9 219.7zM355.1 96c-5.875 10.37-12.88 21.12-21 31.1H113.1c-8.25-10.87-15.3-21.63-21.05-32L355.1 96zM93 415.1c5.875-10.37 12.74-21.13 20.87-32h219.4c8.375 10.87 15.48 21.63 21.23 32H93z'
         };
         clsLevelNode.children.push(ftrLevelNode);
     }
@@ -199,9 +163,8 @@ var PROTEIN_STRUCTURE_VIEWER;
  * METHODS TO MANIPULATE AND INTERACT WITH `PROTEIN_STRUCTURE_VIEW`
  */
 function PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( ) {
-    let featureName = STATE.selectedFeature.split(" > ")[ 2 ];
     PROTEIN_STRUCTURE_VIEWER.clear( );
-    PROTEIN_STRUCTURE_VIEWER.addModel( STATE.vDict.features[ featureName ].allocatedProtein.pdb, "pdb" );
+    PROTEIN_STRUCTURE_VIEWER.addModel( STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.pdb, "pdb" );
     PROTEIN_STRUCTURE_VIEWER.setStyle(
         {
 
@@ -230,25 +193,32 @@ window.onload = _ => {
     FEATURE_SELECTION_ECHART = echarts.init(document.getElementById("main-visualize_overview_feature_selection_echart_container"), { "renderer": "canvas" });
     FEATURE_SELECTION_ECHART.setOption(STATE.featureOverviewEchartOption);
     FEATURE_SELECTION_ECHART.on('click', function (params) {
-        let selectedFeature;
-        if (params.treePathInfo.length === 4) {
-            // document.getElementById( "main-visualize_overview_explore_genotype_button" ).disabled = false;
-            document.getElementById("main-visualize_overview_explore_proteoform_button").disabled = false;
-            selectedFeature = params.treePathInfo[1].name + " > " + params.treePathInfo[2].name + " > " + params.treePathInfo[3].name;
+        let selectedFeatureName = params.data.name;
+        if ( params.data.children === undefined ) {
+            let items =  [
+                {type: 'custom', markup: '<div style="text-align: center;"><b style="padding: 8px;"><i class="fa-solid fa-dna"></i>&nbsp;' + selectedFeatureName + '</b></div>'},
+                {type: 'seperator'}
+            ];
+            if ( STATE.vDict.features[ selectedFeatureName ].allocatedProtein !== { } ) {
+                items.push( {type: 'button', label: 'Explore Proteoforms', onClick: () => {
+                    toggleMainSubcomponent('visualize_proteoforms');
+                    PROTEIN_STRUCTURE_VIEWER_setSelectedFeature();
+                }} );
+            }
+            new Contextual({
+                items: items,
+                width: '182px'
+            });
         } else {
-            // document.getElementById( "main-visualize_overview_explore_genotype_button" ).disabled = true;
-            document.getElementById("main-visualize_overview_explore_proteoform_button").disabled = true;
-            selectedFeature = null;
+            selectedFeatureName = null;
         }
-        STATE.featureOverviewEchartOption.title.text = selectedFeature === null ? 'No Feature Selected' : selectedFeature;
-        STATE.selectedFeature = selectedFeature;
-        document.getElementById( "main-visualize_proteoforms_selected_feature_name" ).innerHTML = selectedFeature;
-        FEATURE_SELECTION_ECHART.setOption(STATE.featureOverviewEchartOption);
+        STATE.selectedFeature = selectedFeatureName;
+        document.getElementById( "main-visualize_proteoforms_selected_feature_name" ).innerHTML = selectedFeatureName;
     });
     // Initialize the `PROTEIN_STRUCTURE_VIEW` component.
     PROTEIN_STRUCTURE_VIEWER = $3Dmol.createViewer(
         $('#main-visualize_proteoforms_structure_viewer_3dmol_container'),
-        { backgroundColor: '#EFF0F8', id: 'PROTEIN_STRUCTURE_VIEW_CANVAS', antialias: true, cartoonQuality: 6 }
+        { backgroundColor: '#FAFAFC', id: 'PROTEIN_STRUCTURE_VIEW_CANVAS', antialias: true, cartoonQuality: 6 }
     );
 };
 
