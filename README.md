@@ -18,7 +18,7 @@
 ---
 ## **Access**:
 The tool is available via GitHub pages at [https://integrative-transcriptomics.github.io/MUSIAL-IVE/](https://integrative-transcriptomics.github.io/MUSIAL-IVE/
-).
+). __The current GitHub pages URL links to version 2.1! If you want to visualize the output of MUSIAL v2.0 please clone the respective branch and start the web page locally.__
 
 ---
 ## **Usage**:
