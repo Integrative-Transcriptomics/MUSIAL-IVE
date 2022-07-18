@@ -138,7 +138,7 @@ var STATE = {
     "noSamples": null,
     "featureOverviewEchartOption": {
         title: {
-            text: 'Leaf Node Color: Mean Proteoform Variant Positions',
+            text: 'Leaf Node Color: Percentage of Variant Positions',
             bottom: '5%',
             right: 'center',
             textStyle: {
@@ -155,8 +155,8 @@ var STATE = {
         },
         visualMap: {
             min: -1,
-            max: 10,
-            range: [0, 10],
+            max: 25,
+            range: [0, 25],
             dimension: 0,
             seriesIndex: 0,
             hoverLink: true,
@@ -166,7 +166,7 @@ var STATE = {
             bottom: '2%',
             align: 'left',
             right: 'center',
-            text: ['≥ 10%', '0%'],
+            text: ['≥ 25%', '0%'],
             textStyle: {
                 color: '#607196',
                 fontSize: 12
@@ -574,6 +574,8 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
         clsLevelNode = chrLevelNode.children.filter(node => node.name === cls)[0];
     }
     if (clsLevelNode.children.filter(node => node.name === ftr).length == 0) {
+
+        /*
         var noProteoforms = 0;
         var sumPercVariantPositions = 0;
         for ( let proteoformName of Object.keys( STATE.vDict.features[ ftr ].allocatedProtein.proteoforms ) ) {
@@ -583,9 +585,33 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
             noProteoforms += 1;
             sumPercVariantPositions += parseFloat( STATE.vDict.features[ ftr ].allocatedProtein.proteoforms[ proteoformName ].annotations.VP );
         }
+        */
+
+        var variablePositionsSet = new Set( );
+        var variablePositions = 0;
+        var featurePositions = STATE.vDict.features[ ftr ].nucleotideSequence.length / 3;
+        for ( let proteoformName of Object.keys( STATE.vDict.features[ ftr ].allocatedProtein.proteoforms ) ) {
+            if ( proteoformName === "WildType" ) {
+                continue;
+            } else {
+                for ( let vp of STATE.vDict.features[ ftr ].allocatedProtein.proteoforms[ proteoformName ].annotations.vSwab.split( "|" ) ) {
+                    let content = vp.split( "@" )[ 0 ]
+                    variablePositionsSet.add( vp.split( "@" )[ 1 ] )
+                    if ( content === "*" ) {
+                        break;
+                    }
+                }
+            }
+        }
+        variablePositionsSet.forEach( ( vp ) => {
+            if ( vp.includes( "+" ) ) {
+                featurePositions += 1;
+            }
+            variablePositions += 1;
+        } );
         ftrLevelNode = {
             name: ftr,
-            value: noProteoforms == 0 ? 0.0 : ( sumPercVariantPositions / noProteoforms ).toFixed( 1 ),
+            value: variablePositions == 0 ? 0.0 : ( 100 * ( variablePositions / featurePositions ) ).toFixed( 1 ),
             symbolSize: 14,
             symbol: 'circle',
         };
