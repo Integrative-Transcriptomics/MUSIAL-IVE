@@ -84,35 +84,35 @@ const AMINO_ACID_DESIGNATION = {
 };
 const AMINO_ACID_COLOR = {
     // Polar (positive), Basic
-    "H": "#96CDEB", // HIS
-    "K": "#96CDEB", // LYS
-    "R": "#96CDEB", // ARG
+    "H": "#69b8e2", // HIS
+    "K": "#7ec2e7", // LYS
+    "R": "#94cceb", // ARG
     // Polar (negative), Acidic
-    "D": "#FF7A83", // ASP
-    "E": "#FF7A83", // GLU
+    "D": "#ff6670", // ASP
+    "E": "#ff8088", // GLU
     // Polar (neutral)
-    "S": "#678D58", // SER
-    "T": "#678D58", // THR
-    "N": "#678D58", // ASN
-    "Q": "#678D58", // GLN
+    "S": "#8fb082", // SER
+    "T": "#9dba91", // THR
+    "N": "#abc4a1", // ASN
+    "Q": "#b9ceb1", // GLN
     // Sulfur bridge forming
-    "C": "#FFEC70", // CYS
+    "C": "#ffee80", // CYS
     // Aromatic
-    "F": "#38369A", // PHE
-    "W": "#38369A", // TRP
-    "Y": "#38369A", // TYR
+    "F": "#b08ed7", // PHE
+    "W": "#bda1de", // TRP
+    "Y": "#a37bd1", // TYR
     // Aliphatic
-    "A": "#41637F", // ALA
-    "V": "#41637F", // VAL
-    "L": "#41637F", // LEU
-    "I": "#41637F", // ILE
-    "M": "#41637F", // MET
-    "P": "#41637F", // PRO
-    "G": "#41637F", // GLY
+    "A": "#4d9099", // ALA
+    "V": "#55a0aa", // VAL
+    "L": "#66a9b2", // LEU
+    "I": "#77b3bb", // ILE
+    "M": "#88bcc3", // MET
+    "P": "#99c6cc", // PRO
+    "G": "#aacfd4", // GLY
     // Other
-    "X":"#524632", // ANY
+    "X":"#a89471", // ANY
     "*": "#FF0099", // TER
-    "-": "#212227" // DEL
+    "-": "#3c3c3c" // DEL
 }
 
 /**
