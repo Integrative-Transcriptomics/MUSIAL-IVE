@@ -53,7 +53,7 @@ const AMINO_ACID_ENCODING = {
     // Other
     "X": 21, // ANY
     "*": 22, // TER
-    "-": 23 // DEL
+    "-": 23 // Gap
 };
 const AMINO_ACID_DECODING = Object.assign( { }, ...Object.entries( AMINO_ACID_ENCODING ).map( ( [ key, value ] ) => ({ [ value ] : key } ) ) );
 const AMINO_ACID_DESIGNATION = {
@@ -86,7 +86,7 @@ const AMINO_ACID_DESIGNATION = {
     // Other
     "X": "Any (X)", // ANY
     "*": "Ter.", // TER
-    "-": "Del." // DEL
+    "-": "Gap" // Gap
 };
 const AMINO_ACID_COLOR = {
     // Polar (positive), Basic
@@ -118,7 +118,7 @@ const AMINO_ACID_COLOR = {
     // Other
     "X":"#a89471", // ANY
     "*": "#FF0099", // TER
-    "-": "#3c3c3c" // DEL
+    "-": "#3c3c3c" // Gap
 }
 
 var FEATURE_OVERVIEW_ECHART;
@@ -156,19 +156,6 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
         clsLevelNode = chrLevelNode.children.filter(node => node.name === cls)[0];
     }
     if (clsLevelNode.children.filter(node => node.name === ftr).length == 0) {
-
-        /*
-        var noProteoforms = 0;
-        var sumPercVariantPositions = 0;
-        for ( let proteoformName of Object.keys( STATE.vDict.features[ ftr ].allocatedProtein.proteoforms ) ) {
-            if ( proteoformName === "WildType" ) {
-                continue;
-            }
-            noProteoforms += 1;
-            sumPercVariantPositions += parseFloat( STATE.vDict.features[ ftr ].allocatedProtein.proteoforms[ proteoformName ].annotations.VP );
-        }
-        */
-
         var variablePositionsSet = new Set( );
         var variablePositions = 0;
         var featurePositions = STATE.vDict.features[ ftr ].nucleotideSequence.length / 3;
@@ -467,11 +454,9 @@ function PROTEOFORM_VARIANTS_ECHART_setChain( chain ) {
             }
         }
     }
-    console.log( STATE.selectedFeature );
-    console.log( "Sample mean VP: " + perSampleVP / STATE.noSamples );
-    console.log( "Sample % PT: " + ( samplePT / STATE.noSamples ) * 100 );
-
-
+    // console.log( STATE.selectedFeature );
+    // console.log( "Sample mean VP: " + perSampleVP / STATE.noSamples );
+    // console.log( "Sample % PT: " + ( samplePT / STATE.noSamples ) * 100 );
     PROTEOFORM_VARIANTS_ECHART.setOption(STATE.proteoformVariantsEchartOption);
     PROTEOFORM_VARIANTS_ECHART.resize( );
 };
@@ -500,16 +485,6 @@ function PROTEOFORM_VARIANTS_ECHART_getPositionComposition( p ) {
     delete states.undefined;
     // Compute variability as number of different variants.
     return states;
-    /* Compute variability as entropy for position.
-    let entropy = 0;
-    for ( let [ content, count ] of Object.entries( states ) ) {
-        if ( Object.keys( states ).length === 1 ) {
-            entropy += 0;
-        } else {
-            entropy += (count / observationsNo) * (Math.log(count / observationsNo) / Math.log( 23 ) );
-        }
-    }
-    return -entropy; */
 };
 
 var POSITION_INFORMATION_ECHART;
