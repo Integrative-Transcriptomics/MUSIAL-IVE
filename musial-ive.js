@@ -186,7 +186,7 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
         };
         clsLevelNode.children.push(ftrLevelNode);
     }
-    FEATURE_SELECTION_ECHART.setOption(STATE.featureOverviewEchartOption);
+    FEATURE_OVERVIEW_ECHART.setOption(STATE.featureOverviewEchartOption);
 };
 
 var PROTEIN_STRUCTURE_VIEWER;
@@ -496,10 +496,10 @@ var POSITION_INFORMATION_ECHART;
  * Methods that are executed once the application has loaded.
  */
 window.onload = _ => {
-    // Initialize the `FEATURE_SELECTION_ECHART` component.
-    FEATURE_SELECTION_ECHART = echarts.init(document.getElementById("main-visualize_overview_feature_selection_echart_container"), { "renderer": "canvas" });
-    FEATURE_SELECTION_ECHART.setOption(STATE.featureOverviewEchartOption);
-    FEATURE_SELECTION_ECHART.on('click', function (params) {
+    // Initialize the `FEATURE_OVERVIEW_ECHART` component.
+    FEATURE_OVERVIEW_ECHART = echarts.init(document.getElementById("main-visualize_overview_feature_overview_echart_container"), { "renderer": "canvas" });
+    FEATURE_OVERVIEW_ECHART.setOption(STATE.featureOverviewEchartOption);
+    FEATURE_OVERVIEW_ECHART.on('click', function (params) {
         let selectedFeatureName = params.data.name;
         if ( params.data.children === undefined ) {
             let items =  [
