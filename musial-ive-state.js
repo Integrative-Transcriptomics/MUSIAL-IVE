@@ -282,23 +282,23 @@
                 type: 'piecewise',
                 pieces: [
                     // Polar (positive), Basic
-                    { min: 1, max: 3, color: "#96CDEB", label: "Polar, Positive" },
+                    { min: 1, max: 3, color: "#69b8e2", label: "Polar, Positive" },
                     // Polar (negative), Acidic
-                    { min: 4, max: 5, color: "#FF7A83", label: "Polar, Negative" },
+                    { min: 4, max: 5, color: "#ff6670", label: "Polar, Negative" },
                     // Polar (neutral)
-                    { min: 6, max: 9, color: "#678D58", label: "Polar, Neutral" },
+                    { min: 6, max: 9, color: "#8fb082", label: "Polar, Neutral" },
                     // Sulfur bridge forming
-                    { min: 10, max: 10, color: "#FFEC70", label: "Cysteine" },
+                    { min: 10, max: 10, color: AMINO_ACID_COLOR[ 'C' ], label: "Cysteine" },
                     // Aromatic
-                    { min: 11, max: 13, color: "#38369A", label: "Aromatic" },
+                    { min: 11, max: 13, color: "#b08ed7", label: "Aromatic" },
                     // Aliphatic
-                    { min: 14, max: 20, color: "#41637F", label: "Aliphatic" },
-                    // Deletion
-                    { min: 23, max: 23, color: "#212227", label: "Deletion" },
+                    { min: 14, max: 20, color: "#4d9099", label: "Aliphatic" },
+                    // Alignment gap
+                    { min: 23, max: 23, color: "#3c3c3c", label: "Gap" },
                     // Termination
                     { min: 22, max: 22, color: "#FF0099", label: "Termination" },
                     // Any
-                    { min: 21, max: 21, color: "#524632", label: "Unknown/Any" }
+                    { min: 21, max: 21, color: "#a89471", label: "Unknown/Any" }
                 ],
                 seriesIndex: [0],
                 show: false,
