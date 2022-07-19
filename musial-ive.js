@@ -359,7 +359,6 @@ function PROTEOFORM_VARIANTS_ECHART_setChain( chain ) {
     PROTEOFORM_VARIANTS_ECHART.setOption(STATE.proteoformVariantsEchartOption);
     PROTEOFORM_VARIANTS_ECHART.resize( );
 };
-
 function PROTEOFORM_VARIANTS_ECHART_getPositionComposition( p ) {
     let states = { };
     let content;
@@ -395,6 +394,12 @@ var POSITION_INFORMATION_ECHART;
  * Methods that are executed once the application has loaded.
  */
 window.onload = _ => {
+    // Populate HTML elements with functions.
+    document.getElementById( "main-visualize_add_features_component" ).onchange = fileInputChange;
+    document.getElementById( "main-menu_about_component" ).onclick = _ => toggleMainSubcomponent( 'about' );
+    document.getElementById( "main-menu_visualize_component" ).onclick = _ => toggleMainSubcomponent('visualize_overview');
+    document.getElementById( "main-menu_legalnotice_component" ).onclick = _ => toggleMainSubcomponent('legal_notice');
+    document.getElementById( "main-visualize_proteoforms_back_button" ).onclick = _ => toggleMainSubcomponent( 'visualize_overview');
     // Initialize the `FEATURE_OVERVIEW_ECHART` component.
     FEATURE_OVERVIEW_ECHART = echarts.init(document.getElementById("main-visualize_overview_feature_overview_echart_container"), { "renderer": "canvas" });
     FEATURE_OVERVIEW_ECHART.setOption(STATE.featureOverviewEchartOption);
@@ -507,11 +512,8 @@ function toggleMainSubcomponent(componentId) {
  * 
  * @param {event} event: File selection event. The `target` of the event has to be a file input element with a `files` attribute yielding a `FileList` instance. 
  */
-function fileInputChange(event) {
-    if (event.isTrusted && event.type === 'change') {
-        let file = event.target.files[0];
-        initializeState(file);
-    }
+function fileInputChange( ) {
+    initializeState( document.getElementById( "main-visualize_add_features_component" ).files[ 0 ] );
 }
 
 /**
