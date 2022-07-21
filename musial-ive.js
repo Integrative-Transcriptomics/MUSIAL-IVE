@@ -62,7 +62,7 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
             if ( proteoformName === "WildType" ) {
                 continue;
             } else {
-                for ( let vp of STATE.vDict.features[ ftr ].allocatedProtein.proteoforms[ proteoformName ].annotations.vSwab.split( "|" ) ) {
+                for ( let vp of STATE.vDict.features[ ftr ].allocatedProtein.proteoforms[ proteoformName ].annotations.VSWAB.split( "|" ) ) {
                     let content = vp.split( "@" )[ 0 ]
                     variablePositionsSet.add( vp.split( "@" )[ 1 ] )
                     if ( content === "*" ) {
@@ -289,7 +289,7 @@ function PROTEOFORM_VARIANTS_ECHART_setChain( chain ) {
     // Add information about filtered non wild type proteoforms.
     for ( let proteoformKey of filteredProteoformKeys ) {
         hasTerminated = false;
-        var proteoformVariants = STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].annotations.vSwab.split( '|' );
+        var proteoformVariants = STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].annotations.VSWAB.split( '|' );
         for ( let proteoformVariant of proteoformVariants ) {
             if ( hasTerminated ) {
                 break;
