@@ -344,6 +344,31 @@ export const AMINO_ACID_COLOR = {
                 }
             }
         ],
+        dataZoom: [
+            {
+                type: 'slider',
+                xAxisIndex: 0,
+                top: '2%',
+                bottom: '92.5%',
+                left: '10%',
+                right: '10%',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                fillerColor: 'rgba(96, 113, 150, 0.05)',
+                handleColor: 'rgba(96, 113, 150, 0.5)',
+                handleSize: '50%',
+                handleStyle: { },
+                moveHandleSize: 1,
+                moveHandleStyle: {
+                    color: '#607196'
+                },
+                emphasis: {
+                    handleStyle: { },
+                    moveHandleStyle: {
+                        color: '#8197cc'
+                    }
+                }
+            }
+        ],
         visualMap: [
             {
                 type: 'piecewise',
@@ -429,7 +454,7 @@ export const AMINO_ACID_COLOR = {
                 data: [],
                 itemStyle: {
                     borderColor: '#fafafc',
-                    borderWidth: 0.2
+                    borderWidth: 0.1
                 },
                 progressive: 1000,
                 animation: false
