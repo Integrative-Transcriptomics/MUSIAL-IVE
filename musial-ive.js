@@ -29,13 +29,13 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
     let chrLevelNode;
     let clsLevelNode;
     let ftrLevelNode;
-    let computeSymbolSize = ( noPf ) => {
-        if ( noPf < 10 ) {
-            return  Math.round( 10 - Math.pow( Math.log( noPf ), 1.5 ) );
-        } else if ( noPf < 20 ) {
+    let computeSymbolSize = (noPf) => {
+        if (noPf < 10) {
+            return Math.round(10 - Math.pow(Math.log(noPf), 1.5));
+        } else if (noPf < 20) {
             return noPf;
         } else {
-            return Math.round( 20 + Math.pow( Math.log( noPf ), 1.5 ) );
+            return Math.round(20 + Math.pow(Math.log(noPf), 1.5));
         }
     };
     if (featureOverviewData.filter(node => node.name == chr).length == 0) {
@@ -64,34 +64,34 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
         clsLevelNode = chrLevelNode.children.filter(node => node.name === cls)[0];
     }
     if (clsLevelNode.children.filter(node => node.name === ftr).length == 0) {
-        var variablePositionsSet = new Set( );
+        var variablePositionsSet = new Set();
         var variablePositions = 0;
-        var featurePositions = STATE.vDict.features[ ftr ].nucleotideSequence.length / 3;
-        var proteoformKeys = Object.keys( STATE.vDict.features[ ftr ].allocatedProtein.proteoforms );
-        for ( let proteoformName of proteoformKeys ) {
-            if ( proteoformName === "WildType" ) {
+        var featurePositions = STATE.vDict.features[ftr].nucleotideSequence.length / 3;
+        var proteoformKeys = Object.keys(STATE.vDict.features[ftr].allocatedProtein.proteoforms);
+        for (let proteoformName of proteoformKeys) {
+            if (proteoformName === "WildType") {
                 continue;
             } else {
-                for ( let vp of STATE.vDict.features[ ftr ].allocatedProtein.proteoforms[ proteoformName ].annotations.VSWAB.split( "|" ) ) {
-                    let content = vp.split( "@" )[ 0 ]
-                    variablePositionsSet.add( vp.split( "@" )[ 1 ] )
-                    if ( content === "*" ) {
+                for (let vp of STATE.vDict.features[ftr].allocatedProtein.proteoforms[proteoformName].annotations.VSWAB.split("|")) {
+                    let content = vp.split("@")[0]
+                    variablePositionsSet.add(vp.split("@")[1])
+                    if (content === "*") {
                         break;
                     }
                 }
             }
         }
-        variablePositionsSet.forEach( ( vp ) => {
-            if ( vp.includes( "+" ) ) {
+        variablePositionsSet.forEach((vp) => {
+            if (vp.includes("+")) {
                 featurePositions += 1;
             }
             variablePositions += 1;
-        } );
+        });
         var noProteoforms = proteoformKeys.length;
         ftrLevelNode = {
             name: ftr,
-            value: variablePositions == 0 ? 0.0 : ( 100 * ( variablePositions / featurePositions ) ).toFixed( 1 ),
-            symbolSize: computeSymbolSize( noProteoforms ),
+            value: variablePositions == 0 ? 0.0 : (100 * (variablePositions / featurePositions)).toFixed(1),
+            symbolSize: computeSymbolSize(noProteoforms),
             symbol: 'circle',
         };
         clsLevelNode.children.push(ftrLevelNode);
@@ -103,12 +103,12 @@ var PROTEIN_STRUCTURE_VIEWER;
 /**
  * METHODS TO MANIPULATE AND INTERACT WITH `PROTEIN_STRUCTURE_VIEW`
  */
-function PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( ) {
-    PROTEIN_STRUCTURE_VIEWER.clear( );
-    PROTEIN_STRUCTURE_VIEWER.addModel( STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.pdb, "pdb" );
+function PROTEIN_STRUCTURE_VIEWER_setSelectedFeature() {
+    PROTEIN_STRUCTURE_VIEWER.clear();
+    PROTEIN_STRUCTURE_VIEWER.addModel(STATE.vDict.features[STATE.selectedFeature].allocatedProtein.pdb, "pdb");
     PROTEIN_STRUCTURE_VIEWER.setStyle(
         {
-            
+
         },
         {
             cartoon: {
@@ -121,23 +121,23 @@ function PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( ) {
     );
     PROTEIN_STRUCTURE_VIEWER.addStyle(
         {
-            resi: STATE.proteoformVariantsEchartOption.series[ 1 ].data
-            .filter( v => { return v[ 1 ] > 1 && v[ 0 ].split( "+" )[ 1 ] === "0" } )
-            .map( v => { return v[ 0 ].split( "+" )[ 0 ] } ),
+            resi: STATE.proteoformVariantsEchartOption.series[1].data
+                .filter(v => { return v[1] > 1 && v[0].split("+")[1] === "0" })
+                .map(v => { return v[0].split("+")[0] }),
             // chain: STATE.selectedChain
         },
         {
             cartoon: {
                 colorfunc: (atom) => {
-                    let noVariants = STATE.proteoformVariantsEchartOption.series[ 1 ].data.filter( v => {return v[ 0 ] === atom.resi + "+0"} )[ 0 ][ 1 ];
+                    let noVariants = STATE.proteoformVariantsEchartOption.series[1].data.filter(v => { return v[0] === atom.resi + "+0" })[0][1];
                     let clr;
-                    if ( noVariants == 2 ) {
+                    if (noVariants == 2) {
                         clr = '#9c73af';
-                    } else if ( noVariants > 2 && noVariants <= 4 ) {
+                    } else if (noVariants > 2 && noVariants <= 4) {
                         clr = '#e56b9d';
-                    } else if ( noVariants > 4 && noVariants <= 8 ) {
+                    } else if (noVariants > 4 && noVariants <= 8) {
                         clr = '#ff7764';
-                    } else if ( noVariants > 8 ) {
+                    } else if (noVariants > 8) {
                         clr = '#ffa600';
                     }
                     return clr;
@@ -148,8 +148,8 @@ function PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( ) {
     PROTEIN_STRUCTURE_VIEWER.zoomTo();
     PROTEIN_STRUCTURE_VIEWER.render();
 };
-function PROTEIN_STRUCTURE_VIEWER_highlightResidue( position, reset ) {
-    if ( reset ) {
+function PROTEIN_STRUCTURE_VIEWER_highlightResidue(position, reset) {
+    if (reset) {
         for (let resi of STATE.highlightedResidues) {
             PROTEIN_STRUCTURE_VIEWER.setStyle(
                 {
@@ -163,15 +163,15 @@ function PROTEIN_STRUCTURE_VIEWER_highlightResidue( position, reset ) {
                     },
                     cartoon: {
                         colorfunc: (atom) => {
-                            let noVariants = STATE.proteoformVariantsEchartOption.series[ 1 ].data.filter( v => {return v[ 0 ] === atom.resi + "+0"} )[ 0 ][ 1 ];
+                            let noVariants = STATE.proteoformVariantsEchartOption.series[1].data.filter(v => { return v[0] === atom.resi + "+0" })[0][1];
                             let clr;
-                            if ( noVariants == 2 ) {
+                            if (noVariants == 2) {
                                 clr = '#9c73af';
-                            } else if ( noVariants > 2 && noVariants <= 4 ) {
+                            } else if (noVariants > 2 && noVariants <= 4) {
                                 clr = '#e56b9d';
-                            } else if ( noVariants > 4 && noVariants <= 8 ) {
+                            } else if (noVariants > 4 && noVariants <= 8) {
                                 clr = '#ff7764';
-                            } else if ( noVariants > 8 ) {
+                            } else if (noVariants > 8) {
                                 clr = '#ffa600';
                             }
                             return clr;
@@ -180,7 +180,7 @@ function PROTEIN_STRUCTURE_VIEWER_highlightResidue( position, reset ) {
                 }
             );
         }
-        STATE.highlightedResidues = [ ];
+        STATE.highlightedResidues = [];
     }
     PROTEIN_STRUCTURE_VIEWER.addStyle(
         {
@@ -189,17 +189,17 @@ function PROTEIN_STRUCTURE_VIEWER_highlightResidue( position, reset ) {
         {
             stick: {
                 colorfunc: (atom) => {
-                    let noVariants = STATE.proteoformVariantsEchartOption.series[ 1 ].data.filter( v => {return v[ 0 ] === atom.resi + "+0"} )[ 0 ][ 1 ];
+                    let noVariants = STATE.proteoformVariantsEchartOption.series[1].data.filter(v => { return v[0] === atom.resi + "+0" })[0][1];
                     let clr;
-                    if ( noVariants == 1 ) {
+                    if (noVariants == 1) {
                         clr = '#FFFFFF';
-                    } else if ( noVariants == 2 ) {
+                    } else if (noVariants == 2) {
                         clr = '#9c73af';
-                    } else if ( noVariants > 2 && noVariants <= 4 ) {
+                    } else if (noVariants > 2 && noVariants <= 4) {
                         clr = '#e56b9d';
-                    } else if ( noVariants > 4 && noVariants <= 8 ) {
+                    } else if (noVariants > 4 && noVariants <= 8) {
                         clr = '#ff7764';
-                    } else if ( noVariants > 8 ) {
+                    } else if (noVariants > 8) {
                         clr = '#ffa600';
                     }
                     return clr;
@@ -208,7 +208,7 @@ function PROTEIN_STRUCTURE_VIEWER_highlightResidue( position, reset ) {
             }
         }
     );
-    STATE.highlightedResidues.push( position );
+    STATE.highlightedResidues.push(position);
     PROTEIN_STRUCTURE_VIEWER.render();
 };
 
@@ -216,61 +216,61 @@ var PROTEOFORM_VARIANTS_ECHART;
 /**
  * METHODS TO MANIPULATE AND INTERACT WITH `PROTEOFORM_VARIANTS_ECHART`
  */
-function PROTEOFORM_VARIANTS_ECHART_setChain( chain ) {
+function PROTEOFORM_VARIANTS_ECHART_setChain(chain) {
     // Reset currently stored information.
-    STATE.perPositionVariantInformation = { };
-    STATE.perProteoformMetaInformation = { };
+    STATE.perPositionVariantInformation = {};
+    STATE.perProteoformMetaInformation = {};
     STATE.noSamples = 0;
     STATE.noProteoforms = 0;
-    STATE.proteoformVariantsEchartOption.xAxis[ 0 ].data = [ ];
-    STATE.proteoformVariantsEchartOption.xAxis[ 1 ].data = [ ];
-    STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data = [ ];
-    STATE.proteoformVariantsEchartOption.yAxis[ 2 ].data = [ ];
-    STATE.proteoformVariantsEchartOption.series[ 0 ].data = [ ];
-    STATE.proteoformVariantsEchartOption.series[ 1 ].data = [ ];
-    STATE.proteoformVariantsEchartOption.series[ 2 ].data = [ ];
+    STATE.proteoformVariantsEchartOption.xAxis[0].data = [];
+    STATE.proteoformVariantsEchartOption.xAxis[1].data = [];
+    STATE.proteoformVariantsEchartOption.yAxis[0].data = [];
+    STATE.proteoformVariantsEchartOption.yAxis[2].data = [];
+    STATE.proteoformVariantsEchartOption.series[0].data = [];
+    STATE.proteoformVariantsEchartOption.series[1].data = [];
+    STATE.proteoformVariantsEchartOption.series[2].data = [];
     // Initialize temp. variables.
     var position = 1;
-    var chainSequence = STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.chainSequences[ chain ];
+    var chainSequence = STATE.vDict.features[STATE.selectedFeature].allocatedProtein.chainSequences[chain];
     var hasTerminated = false;
     // Definition of helper-functions.
-    let addPositionVariantInformation = ( content, position, proteoform, insertionIndex ) => {
+    let addPositionVariantInformation = (content, position, proteoform, insertionIndex) => {
         let p = position + "+" + insertionIndex;
-        if ( p in STATE.perPositionVariantInformation ) {
-            if ( !(proteoform in STATE.perPositionVariantInformation[ p ]) ) {
-                STATE.perPositionVariantInformation[ p ][proteoform] = content;
+        if (p in STATE.perPositionVariantInformation) {
+            if (!(proteoform in STATE.perPositionVariantInformation[p])) {
+                STATE.perPositionVariantInformation[p][proteoform] = content;
             }
         } else {
-            STATE.perPositionVariantInformation[ p ] = { };
-            addPositionVariantInformation( content, position, proteoform, insertionIndex );
+            STATE.perPositionVariantInformation[p] = {};
+            addPositionVariantInformation(content, position, proteoform, insertionIndex);
         }
     };
-    let sortProteoformsByNoSamples = ( pfAName, pfBName ) => {
-        let vpa = parseInt( STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ pfAName ].samples.length );
-        let vpb = parseInt( STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ pfBName ].samples.length );
-        if ( vpa > vpb ) {
+    let sortProteoformsByNoSamples = (pfAName, pfBName) => {
+        let vpa = parseInt(STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[pfAName].samples.length);
+        let vpb = parseInt(STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[pfBName].samples.length);
+        if (vpa > vpb) {
             return 1;
-        } else if ( vpa == vpb ) {
+        } else if (vpa == vpb) {
             return 0;
         } else { // vpa < vpb
-            return -1; 
+            return -1;
         }
-    };  
-    let sortPositions = ( a, b ) => {
-        let va = parseInt( a.split( '+' )[ 0 ] );
-        let vb = parseInt( b.split( '+' )[ 0 ] );
-        if ( va == vb ) {
-            let va = parseInt( a.split( '+' )[ 1 ] );
-            let vb = parseInt( b.split( '+' )[ 1 ] );
-            if ( va > vb ) {
+    };
+    let sortPositions = (a, b) => {
+        let va = parseInt(a.split('+')[0]);
+        let vb = parseInt(b.split('+')[0]);
+        if (va == vb) {
+            let va = parseInt(a.split('+')[1]);
+            let vb = parseInt(b.split('+')[1]);
+            if (va > vb) {
                 return 1;
-            } else if ( va < vb) {
+            } else if (va < vb) {
                 return -1;
             } else {
                 return 0;
             }
         } else {
-            if ( va > vb ) {
+            if (va > vb) {
                 return 1;
             } else {
                 return -1;
@@ -278,89 +278,89 @@ function PROTEOFORM_VARIANTS_ECHART_setChain( chain ) {
         }
     };
     // Filter proteoforms to display; TODO: Adjust by parameter/user defined filtering function
-    var filteredProteoformKeys = Object.keys( STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms ).sort( sortProteoformsByNoSamples ).filter( 
+    var filteredProteoformKeys = Object.keys(STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms).sort(sortProteoformsByNoSamples).filter(
         proteoformKey => {
             return proteoformKey !== "WildType";
             //return proteoformKey !== "WildType" && STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].annotations.PT == 'false';
         }
-    ); 
+    );
     STATE.noProteoforms = filteredProteoformKeys.length + 1;
     // Add information about wild type proteoform.
-    for ( let content of chainSequence.split( '' ) ) {
-        if ( content == content.toUpperCase( ) ) {
+    for (let content of chainSequence.split('')) {
+        if (content == content.toUpperCase()) {
             // Content is of gene and protein.
-            addPositionVariantInformation( content, position, "Wild Type Gene", 0 );
-            addPositionVariantInformation( content, position, "Wild Type Protein", 0 );
+            addPositionVariantInformation(content, position, "Wild Type Gene", 0);
+            addPositionVariantInformation(content, position, "Wild Type Protein", 0);
         } else {
             // Content is only of gene.
-            addPositionVariantInformation( content.toUpperCase( ), position, "Wild Type Gene", 0 );
+            addPositionVariantInformation(content.toUpperCase(), position, "Wild Type Gene", 0);
         }
         position++;
     }
     // Add information about filtered non wild type proteoforms.
-    for ( let proteoformKey of filteredProteoformKeys ) {
+    for (let proteoformKey of filteredProteoformKeys) {
         hasTerminated = false;
-        var proteoformVariants = STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].annotations.VSWAB.split( '|' );
-        for ( let proteoformVariant of proteoformVariants ) {
-            if ( hasTerminated ) {
+        var proteoformVariants = STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].annotations.VSWAB.split('|');
+        for (let proteoformVariant of proteoformVariants) {
+            if (hasTerminated) {
                 break;
             }
-            var proteoformVariantContent = proteoformVariant.split( '@' )[ 0 ];
-            var proteoformVariantPosition = parseInt( proteoformVariant.split( '@' )[ 1 ].split( '+' )[ 0 ] );
-            var proteoformVariantInsertedPosition = parseInt( proteoformVariant.split( '@' )[ 1 ].split( '+' )[ 1 ] );
-            addPositionVariantInformation( proteoformVariantContent, proteoformVariantPosition, proteoformKey, proteoformVariantInsertedPosition );
-            if ( proteoformVariantContent === '*' ) {
+            var proteoformVariantContent = proteoformVariant.split('@')[0];
+            var proteoformVariantPosition = parseInt(proteoformVariant.split('@')[1].split('+')[0]);
+            var proteoformVariantInsertedPosition = parseInt(proteoformVariant.split('@')[1].split('+')[1]);
+            addPositionVariantInformation(proteoformVariantContent, proteoformVariantPosition, proteoformKey, proteoformVariantInsertedPosition);
+            if (proteoformVariantContent === '*') {
                 hasTerminated = SETTINGS._excludePastFirstTerminationVariants;
             }
         }
     }
     // Re-add labels for wild type proteoform.
-    filteredProteoformKeys.push( "Wild Type Gene" );
-    filteredProteoformKeys.push( "Wild Type Protein" );
+    filteredProteoformKeys.push("Wild Type Gene");
+    filteredProteoformKeys.push("Wild Type Protein");
     // Set y-axis label data.
-    STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data = filteredProteoformKeys;
-    STATE.proteoformVariantsEchartOption.yAxis[ 0 ].name = "Proteoforms (m = " + STATE.noProteoforms + ")";
-    STATE.proteoformVariantsEchartOption.yAxis[ 2 ].data = filteredProteoformKeys;
+    STATE.proteoformVariantsEchartOption.yAxis[0].data = filteredProteoformKeys;
+    STATE.proteoformVariantsEchartOption.yAxis[0].name = "Proteoforms (m = " + STATE.noProteoforms + ")";
+    STATE.proteoformVariantsEchartOption.yAxis[2].data = filteredProteoformKeys;
     // Sort positions in ascending order and add information to EChart series and x-axis.
     let i = 0;
-    for ( let position of Object.keys( STATE.perPositionVariantInformation ).sort( sortPositions ) ) {
-        STATE.proteoformVariantsEchartOption.xAxis[ 0 ].data.push( position );
-        STATE.proteoformVariantsEchartOption.xAxis[ 1 ].data.push( position );
-        for ( let [ proteoform, variant ] of Object.entries( STATE.perPositionVariantInformation[ position ] ) ) {
-            STATE.proteoformVariantsEchartOption.series[ 0 ].data.push( [ i, filteredProteoformKeys.indexOf( proteoform ), AMINO_ACID_ENCODING[ variant ] ] );
+    for (let position of Object.keys(STATE.perPositionVariantInformation).sort(sortPositions)) {
+        STATE.proteoformVariantsEchartOption.xAxis[0].data.push(position);
+        STATE.proteoformVariantsEchartOption.xAxis[1].data.push(position);
+        for (let [proteoform, variant] of Object.entries(STATE.perPositionVariantInformation[position])) {
+            STATE.proteoformVariantsEchartOption.series[0].data.push([i, filteredProteoformKeys.indexOf(proteoform), AMINO_ACID_ENCODING[variant]]);
         }
-        STATE.proteoformVariantsEchartOption.series[ 1 ].data.push( [ position, Object.keys( PROTEOFORM_VARIANTS_ECHART_getPositionComposition( position ) ).length ] );
+        STATE.proteoformVariantsEchartOption.series[1].data.push([position, Object.keys(PROTEOFORM_VARIANTS_ECHART_getPositionComposition(position)).length]);
         i++;
     }
     // Compute sample proportion per proteoform.
     let nS;
-    let totalCounts = [ ];
-    for ( let proteoformKey of filteredProteoformKeys ) {
-        if ( proteoformKey === "Wild Type Gene" ) {
-            nS = STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ 'WildType' ].samples.length;
-        } else if ( proteoformKey === "Wild Type Protein" ) {
+    let totalCounts = [];
+    for (let proteoformKey of filteredProteoformKeys) {
+        if (proteoformKey === "Wild Type Gene") {
+            nS = STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms['WildType'].samples.length;
+        } else if (proteoformKey === "Wild Type Protein") {
             nS = 0;
         } else {
-            nS = STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].samples.length;
+            nS = STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].samples.length;
         }
-        totalCounts.push( nS );
+        totalCounts.push(nS);
         STATE.noSamples += nS;
     }
-    STATE.proteoformVariantsEchartOption.series[ 2 ].data = totalCounts.map( v => ( v / STATE.noSamples ).toFixed( 4 ) );
-    
+    STATE.proteoformVariantsEchartOption.series[2].data = totalCounts.map(v => (v / STATE.noSamples).toFixed(4));
+
     // ...
     let perSampleVP = 0;
     let samplePT = 0;
-    for ( let proteoformKey of filteredProteoformKeys ) {
-        if ( proteoformKey == "Wild Type Protein" ) {
+    for (let proteoformKey of filteredProteoformKeys) {
+        if (proteoformKey == "Wild Type Protein") {
             continue;
         } else {
-            if ( proteoformKey == "Wild Type Gene" ) {
+            if (proteoformKey == "Wild Type Gene") {
                 proteoformKey = "WildType";
             }
-            perSampleVP += STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].samples.length * STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].annotations.VP;
-            if ( STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].annotations.PT == "true" ) {
-                samplePT += STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].samples.length
+            perSampleVP += STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].samples.length * STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].annotations.VP;
+            if (STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].annotations.PT == "true") {
+                samplePT += STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].samples.length
             }
         }
     }
@@ -368,28 +368,28 @@ function PROTEOFORM_VARIANTS_ECHART_setChain( chain ) {
     // console.log( "Sample mean VP: " + perSampleVP / STATE.noSamples );
     // console.log( "Sample % PT: " + ( samplePT / STATE.noSamples ) * 100 );
     PROTEOFORM_VARIANTS_ECHART.setOption(STATE.proteoformVariantsEchartOption);
-    PROTEOFORM_VARIANTS_ECHART.resize( );
+    PROTEOFORM_VARIANTS_ECHART.resize();
 };
-function PROTEOFORM_VARIANTS_ECHART_getPositionComposition( p ) {
-    let states = { };
+function PROTEOFORM_VARIANTS_ECHART_getPositionComposition(p) {
+    let states = {};
     let content;
     let observationsNo = 0;
-    for ( let proteoformKey of STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data ) {
-        if ( proteoformKey === "Wild Type Protein" ) {
+    for (let proteoformKey of STATE.proteoformVariantsEchartOption.yAxis[0].data) {
+        if (proteoformKey === "Wild Type Protein") {
             continue;
         } else {
-            content = proteoformKey in STATE.perPositionVariantInformation[ p ] ? STATE.perPositionVariantInformation[ p ][ proteoformKey ] : STATE.perPositionVariantInformation[ p ][ 'Wild Type Gene' ];
-            if ( proteoformKey === "Wild Type Gene" ) {
+            content = proteoformKey in STATE.perPositionVariantInformation[p] ? STATE.perPositionVariantInformation[p][proteoformKey] : STATE.perPositionVariantInformation[p]['Wild Type Gene'];
+            if (proteoformKey === "Wild Type Gene") {
                 proteoformKey = "WildType";
             }
-            if ( content in states ) {
-                states[ content ] += STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].samples.length;
+            if (content in states) {
+                states[content] += STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].samples.length;
             } else {
-                states[ content ] = STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].samples.length;
+                states[content] = STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].samples.length;
             }
         }
-        observationsNo += STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].samples.length;
-        STATE.proteoformVariantsEchartOption.yAxis[ 2 ].name = "Sample Proportion (n = " + observationsNo + ")";
+        observationsNo += STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].samples.length;
+        STATE.proteoformVariantsEchartOption.yAxis[2].name = "Sample Proportion (n = " + observationsNo + ")";
     }
     delete states.undefined;
     // Compute variability as number of different variants.
@@ -406,27 +406,29 @@ var POSITION_INFORMATION_ECHART;
  */
 window.onload = _ => {
     // Populate HTML elements with functions.
-    document.getElementById( "main-visualize_add_features_component" ).onchange = fileInputChange;
-    document.getElementById( "main-menu_about_component" ).onclick = _ => toggleMainSubcomponent( 'about' );
-    document.getElementById( "main-menu_visualize_component" ).onclick = _ => toggleMainSubcomponent('visualize_overview');
-    document.getElementById( "main-menu_legalnotice_component" ).onclick = _ => toggleMainSubcomponent('legal_notice');
-    document.getElementById( "main-visualize_proteoforms_back_button" ).onclick = _ => toggleMainSubcomponent( 'visualize_overview');
+    document.getElementById("main-visualize_add_features_component").onchange = fileInputChange;
+    document.getElementById("main-menu_about_component").onclick = _ => toggleMainSubcomponent('about');
+    document.getElementById("main-menu_visualize_component").onclick = _ => toggleMainSubcomponent('visualize_overview');
+    document.getElementById("main-menu_legalnotice_component").onclick = _ => toggleMainSubcomponent('legal_notice');
+    document.getElementById("main-visualize_proteoforms_back_button").onclick = _ => toggleMainSubcomponent('visualize_overview');
     // Initialize the `FEATURE_OVERVIEW_ECHART` component.
     FEATURE_OVERVIEW_ECHART = echarts.init(document.getElementById("main-visualize_overview_feature_overview_echart_container"), { "renderer": "canvas" });
     FEATURE_OVERVIEW_ECHART.setOption(STATE.featureOverviewEchartOption);
     FEATURE_OVERVIEW_ECHART.on('click', function (params) {
         let selectedFeatureName = params.data.name;
-        if ( params.data.children === undefined ) {
-            let items =  [
-                {type: 'custom', markup: '<div style="text-align: center;"><b style="padding: 8px;">' + selectedFeatureName + '</b></div>'},
-                {type: 'seperator'}
+        if (params.data.children === undefined) {
+            let items = [
+                { type: 'custom', markup: '<div style="text-align: center;"><b style="padding: 8px;">' + selectedFeatureName + '</b></div>' },
+                { type: 'seperator' }
             ];
-            if ( STATE.vDict.features[ selectedFeatureName ].allocatedProtein !== { } ) {
-                items.push( {type: 'button', label: 'Explore Proteoforms (' + Object.keys( STATE.vDict.features[ selectedFeatureName ].allocatedProtein.proteoforms ).length + ')', onClick: () => {
-                    toggleMainSubcomponent('visualize_proteoforms');
-                    PROTEOFORM_VARIANTS_ECHART_setChain( 'A' );
-                    PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( );
-                }} );
+            if (STATE.vDict.features[selectedFeatureName].allocatedProtein !== {}) {
+                items.push({
+                    type: 'button', label: 'Explore Proteoforms (' + Object.keys(STATE.vDict.features[selectedFeatureName].allocatedProtein.proteoforms).length + ')', onClick: () => {
+                        toggleMainSubcomponent('visualize_proteoforms');
+                        PROTEOFORM_VARIANTS_ECHART_setChain('A');
+                        PROTEIN_STRUCTURE_VIEWER_setSelectedFeature();
+                    }
+                });
             }
             new Contextual({
                 items: items,
@@ -436,7 +438,7 @@ window.onload = _ => {
             selectedFeatureName = null;
         }
         STATE.selectedFeature = selectedFeatureName;
-        document.getElementById( "main-visualize_proteoforms_selected_feature_name" ).innerHTML = selectedFeatureName;
+        document.getElementById("main-visualize_proteoforms_selected_feature_name").innerHTML = selectedFeatureName;
     });
     // Initialize the `PROTEIN_STRUCTURE_VIEW` component.
     PROTEIN_STRUCTURE_VIEWER = $3Dmol.createViewer(
@@ -445,50 +447,102 @@ window.onload = _ => {
     );
     // Initialize the `PROTEOFORM_VARIANTS_ECHART` component.
     PROTEOFORM_VARIANTS_ECHART = echarts.init(document.getElementById("main-visualize_proteoforms_variants_viewer_echart_container"), { "renderer": "canvas", "width": 'auto', "height": 'auto' });
+    STATE.proteoformVariantsEchartOption.toolbox.feature["myTool1"] = {
+        show: true,
+        title: 'Proteoform Filters',
+        icon: 'path://M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z',
+        onclick: function () {
+            Swal.fire({
+                title: 'Proteoform Filters',
+                width: 1200,
+                padding: '1%',
+                color: '#6d81ad',
+                background: '#EFF0F8',
+                html: `
+                <div>
+                    <table class="table row-border" data-role="table" data-rows="10" data-show-pagination="false" data-show-search="false" data-show-table-info="false" data-show-rows-steps="false">
+                        <thead>
+                            <tr>
+                                <th data-cls-column="text-left w-25">Filter</th>
+                                <th data-cls-column="w-50">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Exlude Proteoforms with Premature Termination</td>
+                                <td><input id="ProteoformFilter1" type="checkbox" checked data-role="switch"></td>
+                            </tr>
+                            <tr>
+                                <td>Min. Percentage of Variable Positions</td>
+                                <td><input id="ProteoformFilter2" data-role="slider" data-hint="true" data-hint-position="left"></td>
+                            </tr>
+                            <tr>
+                                <td>Min. Sample Proportion</td>
+                                <td><input id="ProteoformFilter3" data-role="slider" data-hint="true" data-hint-position="left"></td>
+                            </tr>
+                            <tr>
+                                <td>Include Only</td>
+                                <td><input id="ProteoformFilter4" type="text" data-role="taginput" data-tag-trigger="Space"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                `,
+                backdrop: `rgba(96, 113, 150, 0.4) no-repeat`
+            }).then((result) => {
+                alert(
+                    [ document.getElementById("ProteoformFilter1").value,
+                    document.getElementById("ProteoformFilter2").value,
+                    document.getElementById("ProteoformFilter3").value,
+                    document.getElementById("ProteoformFilter4").value ]
+                );
+            });
+        }
+    };
     PROTEOFORM_VARIANTS_ECHART.setOption(STATE.proteoformVariantsEchartOption);
     // Initialize the `POSITION_INFORMATION_ECHART` component.
-    STATE.proteoformVariantsEchartOption.tooltip.formatter = ( p ) => {
-        if ( p.seriesIndex === 0 ) {
+    STATE.proteoformVariantsEchartOption.tooltip.formatter = (p) => {
+        if (p.seriesIndex === 0) {
             let position = p.name;
-            let proteoformName = STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data[ p.data[ 1 ] ];
-            let mutatedResidue = AMINO_ACID_DECODING[ p.data[ 2 ] ];
+            let proteoformName = STATE.proteoformVariantsEchartOption.yAxis[0].data[p.data[1]];
+            let mutatedResidue = AMINO_ACID_DECODING[p.data[2]];
             let wildTypeResidue;
             let isInsertion = false;
-            if ( position.split( "+" )[ 1 ] === "0" ) {
-                wildTypeResidue = AMINO_ACID_DECODING[ STATE.proteoformVariantsEchartOption.series[ 0 ].data.filter( e => e[ 0 ] == p.data[ 0 ] && e[ 1 ] == STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data.indexOf( "Wild Type Gene" ) )[ 0 ][ 2 ] ];
+            if (position.split("+")[1] === "0") {
+                wildTypeResidue = AMINO_ACID_DECODING[STATE.proteoformVariantsEchartOption.series[0].data.filter(e => e[0] == p.data[0] && e[1] == STATE.proteoformVariantsEchartOption.yAxis[0].data.indexOf("Wild Type Gene"))[0][2]];
             } else {
                 wildTypeResidue = "None";
                 isInsertion = true;
             }
-            let sampleProportion =  STATE.proteoformVariantsEchartOption.series[ 2 ].data[ STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data.indexOf( proteoformName ) ];
-            let noVariants = STATE.proteoformVariantsEchartOption.series[ 1 ].data.filter( e => e[ 0 ] == position )[ 0 ][ 1 ]
-            let positionComposition = PROTEOFORM_VARIANTS_ECHART_getPositionComposition( position );
+            let sampleProportion = STATE.proteoformVariantsEchartOption.series[2].data[STATE.proteoformVariantsEchartOption.yAxis[0].data.indexOf(proteoformName)];
+            let noVariants = STATE.proteoformVariantsEchartOption.series[1].data.filter(e => e[0] == position)[0][1]
+            let positionComposition = PROTEOFORM_VARIANTS_ECHART_getPositionComposition(position);
             let html = `
                 <div>
-                    <p>Proteoform <b>` + proteoformName + `</b>&nbsp;(` + Math.round( sampleProportion * STATE.noSamples ) + ` sample(s))</p>
+                    <p>Proteoform <b>` + proteoformName + `</b>&nbsp;(` + Math.round(sampleProportion * STATE.noSamples) + ` sample(s))</p>
                     <p>Relative Position <b>` + position + `</b></p>
-                    <p>Variant <b>` + AMINO_ACID_DESIGNATION[ wildTypeResidue ] + ` &#8594; ` + AMINO_ACID_DESIGNATION[ mutatedResidue ] + `</b></p>
+                    <p>Variant <b>` + AMINO_ACID_DESIGNATION[wildTypeResidue] + ` &#8594; ` + AMINO_ACID_DESIGNATION[mutatedResidue] + `</b></p>
                     <p>Total Number of Variants <b>` + noVariants + `</b></p>
                     <div id="position_information_echart_container" style="width: 340px; height: 230px;"></div>
                 </div>
             `;
-            document.getElementById( "main-visualize_proteoforms_position_information_container" ).innerHTML = html;
+            document.getElementById("main-visualize_proteoforms_position_information_container").innerHTML = html;
             POSITION_INFORMATION_ECHART = echarts.init(document.getElementById("position_information_echart_container"), { "renderer": "canvas" });
-            STATE.positionVariantCompositionEchartOption.series[ 0 ].data = [ ];
-            for ( let [ key, value ] of Object.entries( positionComposition ) ) {
-                STATE.positionVariantCompositionEchartOption.series[ 0 ].data.push( {
-                    name: AMINO_ACID_DESIGNATION[ key ] + ", " + value + " of " + Object.values( positionComposition ).reduce( ( i1, i2 ) => i1 + i2 ),
+            STATE.positionVariantCompositionEchartOption.series[0].data = [];
+            for (let [key, value] of Object.entries(positionComposition)) {
+                STATE.positionVariantCompositionEchartOption.series[0].data.push({
+                    name: AMINO_ACID_DESIGNATION[key] + ", " + value + " of " + Object.values(positionComposition).reduce((i1, i2) => i1 + i2),
                     value: value,
                     itemStyle: {
-                        color: AMINO_ACID_COLOR[ key ],
+                        color: AMINO_ACID_COLOR[key],
                         borderWidth: key === mutatedResidue ? 5 : 0
                     }
-                } );
+                });
             }
-            POSITION_INFORMATION_ECHART.setOption( STATE.positionVariantCompositionEchartOption );
-            PROTEIN_STRUCTURE_VIEWER_highlightResidue( position.split( "+" )[ 0 ], true );
+            POSITION_INFORMATION_ECHART.setOption(STATE.positionVariantCompositionEchartOption);
+            PROTEIN_STRUCTURE_VIEWER_highlightResidue(position.split("+")[0], true);
         } else {
-            document.getElementById( "main-visualize_proteoforms_position_information_container" ).innerHTML = "";
+            document.getElementById("main-visualize_proteoforms_position_information_container").innerHTML = "";
         }
     }
 };
@@ -568,8 +622,8 @@ function toggleMainSubcomponent(componentId) {
  * 
  * @param {event} event: File selection event. The `target` of the event has to be a file input element with a `files` attribute yielding a `FileList` instance. 
  */
-function fileInputChange( ) {
-    initializeState( document.getElementById( "main-visualize_add_features_component" ).files[ 0 ] );
+function fileInputChange() {
+    initializeState(document.getElementById("main-visualize_add_features_component").files[0]);
 }
 
 /**
@@ -613,10 +667,10 @@ function initializeState(file) {
  * @returns 
  */
 function sortObject(object, sortBy) {
-    let sortedObject = { };
-    for ( let key of Object.keys( object ).sort( sortBy ) ) {
-        sortedObject[ key ] = object[ key ];
+    let sortedObject = {};
+    for (let key of Object.keys(object).sort(sortBy)) {
+        sortedObject[key] = object[key];
     };
-    console.log( sortedObject );
+    console.log(sortedObject);
     return sortedObject;
 }

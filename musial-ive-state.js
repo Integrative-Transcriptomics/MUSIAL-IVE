@@ -242,6 +242,12 @@ export const AMINO_ACID_COLOR = {
             borderWidth: 0,
             formatter: null
         },
+        toolbox: {
+            orient: 'vertical',
+            show: 'true',
+            right: 'right',
+            feature: { }
+        },
         axisPointer: {
             link: {
                 xAxisIndex: [ 0 ],
