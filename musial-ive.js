@@ -451,38 +451,42 @@ window.onload = _ => {
         if ( p.seriesIndex === 0 ) {
             let position = p.name;
             let proteoformName = STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data[ p.data[ 1 ] ];
+            let mutatedResidue = AMINO_ACID_DECODING[ p.data[ 2 ] ];
+            let wildTypeResidue;
+            let isInsertion = false;
             if ( position.split( "+" )[ 1 ] === "0" ) {
-                let mutatedResidue = AMINO_ACID_DECODING[ p.data[ 2 ] ];
-                let wildTypeResidue = AMINO_ACID_DECODING[ STATE.proteoformVariantsEchartOption.series[ 0 ].data.filter( e => e[ 0 ] == p.data[ 0 ] && e[ 1 ] == STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data.indexOf( "Wild Type Gene" ) )[ 0 ][ 2 ] ];
-                let sampleProportion =  STATE.proteoformVariantsEchartOption.series[ 2 ].data[ STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data.indexOf( proteoformName ) ];
-                let noVariants = STATE.proteoformVariantsEchartOption.series[ 1 ].data.filter( e => e[ 0 ] == position )[ 0 ][ 1 ]
-                let positionComposition = PROTEOFORM_VARIANTS_ECHART_getPositionComposition( position );
-                console.log( positionComposition );
-                let html = `
-                    <div>
-                        <p>Proteoform <b>` + proteoformName + `</b>&nbsp;(` + Math.round( sampleProportion * STATE.noSamples ) + ` of ` + STATE.noSamples + ` samples)</p>
-                        <p>Relative Position <b>` + position + `</b></p>
-                        <p>Variant <b>` + AMINO_ACID_DESIGNATION[ wildTypeResidue ] + ` &#8594; ` + AMINO_ACID_DESIGNATION[ mutatedResidue ] + `</b></p>
-                        <p>Total Number of Variants <b>` + noVariants + `</b></p>
-                        <div id="position_information_echart_container" style="width: 340px; height: 230px;"></div>
-                    </div>
-                `;
-                document.getElementById( "main-visualize_proteoforms_position_information_container" ).innerHTML = html;
-                POSITION_INFORMATION_ECHART = echarts.init(document.getElementById("position_information_echart_container"), { "renderer": "canvas" });
-                STATE.positionVariantCompositionEchartOption.series[ 0 ].data = [ ];
-                for ( let [ key, value ] of Object.entries( positionComposition ) ) {
-                    STATE.positionVariantCompositionEchartOption.series[ 0 ].data.push( {
-                        name: AMINO_ACID_DESIGNATION[ key ] + ", " + value + " of " + Object.values( positionComposition ).reduce( ( i1, i2 ) => i1 + i2 ),
-                        value: value,
-                        itemStyle: {
-                            color: AMINO_ACID_COLOR[ key ],
-                            borderWidth: key === mutatedResidue ? 5 : 0
-                        }
-                    } );
-                }
-                POSITION_INFORMATION_ECHART.setOption( STATE.positionVariantCompositionEchartOption );
-                PROTEIN_STRUCTURE_VIEWER_highlightResidue( position.split( "+" )[ 0 ], true );
+                wildTypeResidue = AMINO_ACID_DECODING[ STATE.proteoformVariantsEchartOption.series[ 0 ].data.filter( e => e[ 0 ] == p.data[ 0 ] && e[ 1 ] == STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data.indexOf( "Wild Type Gene" ) )[ 0 ][ 2 ] ];
+            } else {
+                wildTypeResidue = "None";
+                isInsertion = true;
             }
+            let sampleProportion =  STATE.proteoformVariantsEchartOption.series[ 2 ].data[ STATE.proteoformVariantsEchartOption.yAxis[ 0 ].data.indexOf( proteoformName ) ];
+            let noVariants = STATE.proteoformVariantsEchartOption.series[ 1 ].data.filter( e => e[ 0 ] == position )[ 0 ][ 1 ]
+            let positionComposition = PROTEOFORM_VARIANTS_ECHART_getPositionComposition( position );
+            let html = `
+                <div>
+                    <p>Proteoform <b>` + proteoformName + `</b>&nbsp;(` + Math.round( sampleProportion * STATE.noSamples ) + ` sample(s))</p>
+                    <p>Relative Position <b>` + position + `</b></p>
+                    <p>Variant <b>` + AMINO_ACID_DESIGNATION[ wildTypeResidue ] + ` &#8594; ` + AMINO_ACID_DESIGNATION[ mutatedResidue ] + `</b></p>
+                    <p>Total Number of Variants <b>` + noVariants + `</b></p>
+                    <div id="position_information_echart_container" style="width: 340px; height: 230px;"></div>
+                </div>
+            `;
+            document.getElementById( "main-visualize_proteoforms_position_information_container" ).innerHTML = html;
+            POSITION_INFORMATION_ECHART = echarts.init(document.getElementById("position_information_echart_container"), { "renderer": "canvas" });
+            STATE.positionVariantCompositionEchartOption.series[ 0 ].data = [ ];
+            for ( let [ key, value ] of Object.entries( positionComposition ) ) {
+                STATE.positionVariantCompositionEchartOption.series[ 0 ].data.push( {
+                    name: AMINO_ACID_DESIGNATION[ key ] + ", " + value + " of " + Object.values( positionComposition ).reduce( ( i1, i2 ) => i1 + i2 ),
+                    value: value,
+                    itemStyle: {
+                        color: AMINO_ACID_COLOR[ key ],
+                        borderWidth: key === mutatedResidue ? 5 : 0
+                    }
+                } );
+            }
+            POSITION_INFORMATION_ECHART.setOption( STATE.positionVariantCompositionEchartOption );
+            PROTEIN_STRUCTURE_VIEWER_highlightResidue( position.split( "+" )[ 0 ], true );
         } else {
             document.getElementById( "main-visualize_proteoforms_position_information_container" ).innerHTML = "";
         }

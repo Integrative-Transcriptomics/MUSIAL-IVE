@@ -82,7 +82,8 @@ export const AMINO_ACID_DESIGNATION = {
     // Other
     "X": "Any (X)", // ANY
     "*": "Ter.", // TER
-    "-": "Gap" // Gap
+    "-": "Gap", // Gap
+    "None": "None" // Insertion
 };
 
 export const AMINO_ACID_COLOR = {
@@ -236,7 +237,7 @@ export const AMINO_ACID_COLOR = {
                 type: 'cross'
             },
             position: [ '1%', '-85%' ],
-            extraCssText: "height: 80%; width: 22%; overflow-y: scroll;",
+            extraCssText: "height: 80%; width: 24%; overflow-y: scroll;",
             borderColor: '#607196',
             borderWidth: 0,
             formatter: null
@@ -261,7 +262,7 @@ export const AMINO_ACID_COLOR = {
                     show: true,
                     interval: 0
                 },
-                name: 'Global Proteoform Position',
+                name: 'Relative Position (wrt. Wild Type)',
                 nameLocation: 'center',
                 nameGap: 25,
                 nameTextStyle: {
