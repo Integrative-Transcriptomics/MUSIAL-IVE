@@ -191,6 +191,7 @@ export const AMINO_ACID_COLOR = {
                 initalTreeDepth: 2,
                 right: '10%',
                 left: '10%',
+                orient: 'LR',
                 label: {
                     position: 'right',
                     fontWeight: 'bold',

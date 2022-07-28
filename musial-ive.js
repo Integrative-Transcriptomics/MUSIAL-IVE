@@ -29,6 +29,15 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
     let chrLevelNode;
     let clsLevelNode;
     let ftrLevelNode;
+    let computeSymbolSize = ( noPf ) => {
+        if ( noPf < 10 ) {
+            return  Math.round( 10 - Math.pow( Math.log( noPf ), 1.5 ) );
+        } else if ( noPf < 20 ) {
+            return noPf;
+        } else {
+            return Math.round( 20 + Math.pow( Math.log( noPf ), 1.5 ) );
+        }
+    };
     if (featureOverviewData.filter(node => node.name == chr).length == 0) {
         chrLevelNode = {
             name: chr,
@@ -58,7 +67,8 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
         var variablePositionsSet = new Set( );
         var variablePositions = 0;
         var featurePositions = STATE.vDict.features[ ftr ].nucleotideSequence.length / 3;
-        for ( let proteoformName of Object.keys( STATE.vDict.features[ ftr ].allocatedProtein.proteoforms ) ) {
+        var proteoformKeys = Object.keys( STATE.vDict.features[ ftr ].allocatedProtein.proteoforms );
+        for ( let proteoformName of proteoformKeys ) {
             if ( proteoformName === "WildType" ) {
                 continue;
             } else {
@@ -77,10 +87,11 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
             }
             variablePositions += 1;
         } );
+        var noProteoforms = proteoformKeys.length;
         ftrLevelNode = {
             name: ftr,
             value: variablePositions == 0 ? 0.0 : ( 100 * ( variablePositions / featurePositions ) ).toFixed( 1 ),
-            symbolSize: 14,
+            symbolSize: computeSymbolSize( noProteoforms ),
             symbol: 'circle',
         };
         clsLevelNode.children.push(ftrLevelNode);
@@ -411,7 +422,7 @@ window.onload = _ => {
                 {type: 'seperator'}
             ];
             if ( STATE.vDict.features[ selectedFeatureName ].allocatedProtein !== { } ) {
-                items.push( {type: 'button', label: 'Explore Proteoforms', onClick: () => {
+                items.push( {type: 'button', label: 'Explore Proteoforms (' + Object.keys( STATE.vDict.features[ selectedFeatureName ].allocatedProtein.proteoforms ).length + ')', onClick: () => {
                     toggleMainSubcomponent('visualize_proteoforms');
                     PROTEOFORM_VARIANTS_ECHART_setChain( 'A' );
                     PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( );
