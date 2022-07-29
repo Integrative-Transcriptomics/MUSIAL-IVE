@@ -283,10 +283,10 @@ function PROTEOFORM_VARIANTS_ECHART_setChain(chain) {
             if ( SETTINGS._PROTEOFORMFILTER_EXCLUDEPT && STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].annotations.PT == "true" ) {
                 // Filter for absence of premature termination; If filter is set. 
                 return false;
-            } else if ( parseFloat( ( STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].samples.length / Object.keys( STATE.vDict.samples ).length ) * 100 ) <= SETTINGS._PROTEOFORMFILTER_MINSP ) {
-                // Filter for sample proportion below set threshold.
+            } else if ( STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].samples.length < SETTINGS._PROTEOFORMFILTER_MINSP ) {
+                // Filter for No. samples  below set threshold.
                 return false;
-            } else if (  parseFloat( STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].annotations.VP ) <= SETTINGS._PROTEOFORMFILTER_MINVP ) {
+            } else if (  parseFloat( STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].annotations.VP ) < SETTINGS._PROTEOFORMFILTER_MINVP ) {
                 // Filter for variable position percentage below set threshold.
                 return false;
             } else {
@@ -493,11 +493,11 @@ window.onload = _ => {
                             </tr>
                             <tr>
                                 <td>Min. Percentage of Variable Positions</td>
-                                <td><input id="COMPONENT_PROTEOFORMFILTER_MINVP" data-role="slider" data-hint="true" data-hint-position="left"></td>
+                                <td><br><input id="COMPONENT_PROTEOFORMFILTER_MINVP" data-show-min-max="true" data-accuracy="0.1" data-role="slider" data-hint="true" data-hint-position="top"></td>
                             </tr>
                             <tr>
-                                <td>Min. Sample Proportion</td>
-                                <td><input id="COMPONENT_PROTEOFORMFILTER_MINSP" data-role="slider" data-hint="true" data-hint-position="left"></td>
+                                <td>Min. No. Samples</td>
+                                <td><br><input id="COMPONENT_PROTEOFORMFILTER_MINSP" data-value="1" data-return-type="value" data-show-min-max="true" data-min="1" data-max="` +  Object.keys( STATE.vDict.samples ).length + `" data-accuracy="1" data-role="slider" data-hint="true" data-hint-position="top"></td>
                             </tr>
                             <tr>
                                 <td>Include Only</td>
