@@ -20,5 +20,10 @@
  */
  export var SETTINGS = {
     "_verbose": true,
-    "_excludePastFirstTerminationVariants": true
+    "_excludePastFirstTerminationVariants": true,
+    "_PROTEOFORMFILTER_EXCLUDEPT": false,
+    "_PROTEOFORMFILTER_MINVP": 0.0,
+    "_PROTEOFORMFILTER_MINSP": 0.0,
+    "_PROTEOFORMFILTER_CONSIDEREDPF": [ ],
+    "_PROTEOFORMFILTER_CONSIDEREDSAMPLES": [ ]
 };

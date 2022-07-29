@@ -280,8 +280,27 @@ function PROTEOFORM_VARIANTS_ECHART_setChain(chain) {
     // Filter proteoforms to display; TODO: Adjust by parameter/user defined filtering function
     var filteredProteoformKeys = Object.keys(STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms).sort(sortProteoformsByNoSamples).filter(
         proteoformKey => {
-            return proteoformKey !== "WildType";
-            //return proteoformKey !== "WildType" && STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].annotations.PT == 'false';
+            if ( SETTINGS._PROTEOFORMFILTER_EXCLUDEPT && STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].annotations.PT == "true" ) {
+                // Filter for absence of premature termination; If filter is set. 
+                return false;
+            } else if ( parseFloat( ( STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].samples.length / Object.keys( STATE.vDict.samples ).length ) * 100 ) <= SETTINGS._PROTEOFORMFILTER_MINSP ) {
+                // Filter for sample proportion below set threshold.
+                return false;
+            } else if (  parseFloat( STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].annotations.VP ) <= SETTINGS._PROTEOFORMFILTER_MINVP ) {
+                // Filter for variable position percentage below set threshold.
+                return false;
+            } else {
+                // Filter if proteoform name or contained sample is explicitly stated to be included.
+                let PFIsIncluded = SETTINGS._PROTEOFORMFILTER_CONSIDEREDPF.length == 0 && SETTINGS._PROTEOFORMFILTER_CONSIDEREDSAMPLES.length == 0;
+                let PFIncludesSample = SETTINGS._PROTEOFORMFILTER_CONSIDEREDPF.length == 0 && SETTINGS._PROTEOFORMFILTER_CONSIDEREDSAMPLES.length == 0;
+                if ( !PFIsIncluded ) {
+                    PFIsIncluded = SETTINGS._PROTEOFORMFILTER_CONSIDEREDPF.includes( proteoformKey );
+                }
+                if ( !PFIncludesSample ) {
+                    PFIncludesSample = SETTINGS._PROTEOFORMFILTER_CONSIDEREDSAMPLES.some( sId => STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[ proteoformKey ].samples.includes( sId ) );
+                }
+                return ( PFIsIncluded || PFIncludesSample ) && proteoformKey !== "WildType";
+            }
         }
     );
     STATE.noProteoforms = filteredProteoformKeys.length + 1;
@@ -426,7 +445,7 @@ window.onload = _ => {
                     type: 'button', label: 'Explore Proteoforms (' + Object.keys(STATE.vDict.features[selectedFeatureName].allocatedProtein.proteoforms).length + ')', onClick: () => {
                         toggleMainSubcomponent('visualize_proteoforms');
                         PROTEOFORM_VARIANTS_ECHART_setChain('A');
-                        PROTEIN_STRUCTURE_VIEWER_setSelectedFeature();
+                        PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( );
                     }
                 });
             }
@@ -470,32 +489,40 @@ window.onload = _ => {
                         <tbody>
                             <tr>
                                 <td>Exlude Proteoforms with Premature Termination</td>
-                                <td><input id="ProteoformFilter1" type="checkbox" checked data-role="switch"></td>
+                                <td><input id="COMPONENT_PROTEOFORMFILTER_EXCLUDEPT" type="checkbox" data-role="switch"></td>
                             </tr>
                             <tr>
                                 <td>Min. Percentage of Variable Positions</td>
-                                <td><input id="ProteoformFilter2" data-role="slider" data-hint="true" data-hint-position="left"></td>
+                                <td><input id="COMPONENT_PROTEOFORMFILTER_MINVP" data-role="slider" data-hint="true" data-hint-position="left"></td>
                             </tr>
                             <tr>
                                 <td>Min. Sample Proportion</td>
-                                <td><input id="ProteoformFilter3" data-role="slider" data-hint="true" data-hint-position="left"></td>
+                                <td><input id="COMPONENT_PROTEOFORMFILTER_MINSP" data-role="slider" data-hint="true" data-hint-position="left"></td>
                             </tr>
                             <tr>
                                 <td>Include Only</td>
-                                <td><input id="ProteoformFilter4" type="text" data-role="taginput" data-tag-trigger="Space"></td>
+                                <td><input id="COMPONENT__PROTEOFORMFILTER_CONSIDERED" type="text" data-role="taginput" data-tag-trigger="Space"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 `,
                 backdrop: `rgba(96, 113, 150, 0.4) no-repeat`
-            }).then((result) => {
-                alert(
-                    [ document.getElementById("ProteoformFilter1").value,
-                    document.getElementById("ProteoformFilter2").value,
-                    document.getElementById("ProteoformFilter3").value,
-                    document.getElementById("ProteoformFilter4").value ]
-                );
+            }).then( _ => {
+                SETTINGS._PROTEOFORMFILTER_EXCLUDEPT =  $( "#COMPONENT_PROTEOFORMFILTER_EXCLUDEPT" ).is(':checked');
+                SETTINGS._PROTEOFORMFILTER_MINVP = parseFloat( document.getElementById( "COMPONENT_PROTEOFORMFILTER_MINVP" ).value );
+                SETTINGS._PROTEOFORMFILTER_MINSP = parseFloat( document.getElementById( "COMPONENT_PROTEOFORMFILTER_MINSP" ).value );
+                SETTINGS._PROTEOFORMFILTER_CONSIDEREDPF = [ ];
+                SETTINGS._PROTEOFORMFILTER_CONSIDEREDSAMPLES = [ ];
+                for ( let considered of document.getElementById( "COMPONENT__PROTEOFORMFILTER_CONSIDERED" ).value.split( "," ) ) {
+                    if ( considered.startsWith( "PF" ) && considered in STATE.vDict.features[ STATE.selectedFeature ].allocatedProtein.proteoforms  ) {
+                        SETTINGS._PROTEOFORMFILTER_CONSIDEREDPF.push( considered );
+                    } else if ( considered in STATE.vDict.samples ) {
+                        SETTINGS._PROTEOFORMFILTER_CONSIDEREDSAMPLES.push( considered );
+                    }
+                }
+                PROTEOFORM_VARIANTS_ECHART_setChain('A');
+                PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( );
             });
         }
     };
