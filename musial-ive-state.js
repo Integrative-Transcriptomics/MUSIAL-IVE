@@ -373,6 +373,29 @@ export const AMINO_ACID_COLOR = {
                         color: '#8197cc'
                     }
                 }
+            },
+            {
+                type: 'slider',
+                yAxisIndex: 0,
+                top: '10%',
+                bottom: '10%',
+                left: '91.5%',
+                right: '5%',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                fillerColor: 'rgba(96, 113, 150, 0.05)',
+                handleColor: 'rgba(96, 113, 150, 0.5)',
+                handleSize: '50%',
+                handleStyle: { },
+                moveHandleSize: 1,
+                moveHandleStyle: {
+                    color: '#607196'
+                },
+                emphasis: {
+                    handleStyle: { },
+                    moveHandleStyle: {
+                        color: '#8197cc'
+                    }
+                }
             }
         ],
         visualMap: [
