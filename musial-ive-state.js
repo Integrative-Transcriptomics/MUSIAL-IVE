@@ -14,9 +14,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * Definition of constants.
- */
+// Mapping of single-letter aminoacid code to numbers.
  export const AMINO_ACID_ENCODING = {
     // Polar (positive), Basic
     "H": 1, // HIS
@@ -50,8 +48,10 @@
     "-": 23 // Gap
 };
 
+// Reverse mapping of the AMINO_ACID_ENCODING constant.
 export const AMINO_ACID_DECODING = Object.assign( { }, ...Object.entries( AMINO_ACID_ENCODING ).map( ( [ key, value ] ) => ({ [ value ] : key } ) ) );
 
+// Mapping of single-letter aminoacid code to more human readable three letter code.
 export const AMINO_ACID_DESIGNATION = {
     // Polar (positive), Basic
     "H": "His (H)", // HIS
@@ -86,6 +86,7 @@ export const AMINO_ACID_DESIGNATION = {
     "None": "None" // Insertion
 };
 
+// Mapping of single-letter aminoacid code to colors.
 export const AMINO_ACID_COLOR = {
     // Polar (positive), Basic
     "H": "#69b8e2", // HIS
@@ -119,34 +120,30 @@ export const AMINO_ACID_COLOR = {
     "-": "#3c3c3c" // Gap
 }
 
-/**
- * The `STATE` variable is used to store the current state of the application, i.e. currently loaded data and user interaction.
- */
+// STATE: Object; Used to store the current state, i.e., all variable values, of the current session.
  export var STATE = {
+    // vDict: Object; A variants dictionary (<FILENAME>.vdict.json) output by MUSIAL. 
     "vDict": null,
+    // selectedFeature: String; Currently selected (genomic) feature.
     "selectedFeature": null,
+    // selectedChain: String, Currently selected chain.
     "selectedChain": null,
-    "highlightedResidues": [],
+    // selectedResidue: Object, Selected residue per feature.
+    "selectedResidue": { },
+
     "perPositionVariantInformation": {},
     "perProteoformMetaInformation": {},
     "noProteoforms": null,
     "noSamples": null,
-    "featureOverviewEchartOption": {
+    "mainVisualizeOverviewEchart": {
         title: {
-            text: 'Leaf Node Size: No. Proteoforms; ln( #PF )² | Leaf Node Color: Percentage of Variant Positions',
+            text: 'Leaf Node Size: No. Proteoforms | Leaf Node Color: Percentage of Variant Positions',
             bottom: '5%',
             right: 'center',
             textStyle: {
                 color: '#607196',
                 fontSize: 12
             }
-        },
-        toolbox: {
-            feature: {
-
-            },
-            bottom: '2%',
-            left: '1%'
         },
         visualMap: {
             min: -1,
@@ -204,7 +201,7 @@ export const AMINO_ACID_COLOR = {
             }
         ]
     },
-    "proteoformVariantsEchartOption": {
+    "mainVisualizeProteoformsVariantsEchart": {
         title: [ ],
         grid: [
             {
@@ -511,7 +508,7 @@ export const AMINO_ACID_COLOR = {
             }
         ]
     },
-    "positionVariantCompositionEchartOption": {
+    "mainVisualizeProteoformsPositioninformationEchart": {
         legend: {
             type: 'scroll',
             right: 'right',

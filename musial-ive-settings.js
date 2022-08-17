@@ -14,13 +14,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * The `SETTINGS` variable is used to store variables used by the web-app, e.g. colors.
- * `SETTINGS` that shall not be changed by user interactions start with a `_` symbol.
- */
+// SETTINGS: Object; Used to store session settings.
  export var SETTINGS = {
+    // _verbose: Boolean; Whether to output user information (currently unused).
     "_verbose": true,
-    "_excludePastFirstTerminationVariants": true,
+    "_main_visualize_proteoforms_truncateAfterFirstTermination": true,
     "_PROTEOFORMFILTER_EXCLUDEPT": false,
     "_PROTEOFORMFILTER_MINVP": 0.0,
     "_PROTEOFORMFILTER_MINSP": 0.0,

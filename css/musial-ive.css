@@ -13,13 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-/*
-[1] Imports
-*/
-/*
-[2] Definition of root properties and variables.
-*/
+/* Definition of root properties and variables. */
 :root {
   font-family: Arial, Helvetica, sans-serif, 'Genos';
   --background-color: #EFF0F8;
@@ -34,10 +28,7 @@
   --error-color: #fe4848cc;
   --menu-height: 60px;
 }
-/*
-[3] Definition of style properties for classes.
-*/
-/* Custom scrollbar design. */
+/* Definition of style properties for classes. */
 ::-webkit-scrollbar {
   width: 4px;
   margin-left: 1px;
@@ -113,9 +104,7 @@
   margin: 5px;
   height: 95%;
 }
-/*
-[4] Definition of style properties for components via their id.
-*/
+/* Definition of style properties for components via their id. */
 #main {
   position: fixed;
   top: 0;
@@ -139,7 +128,7 @@
   top: 0;
   left: 0;
 }
-#main-visualize-overview-echarts {
+#main-visualize-overview-echart {
   background-color: var(--background-color-3);
   border: 1px solid #E4E5ED;
   position: absolute;
@@ -188,7 +177,7 @@
   width: 18%;
   height: calc( 45% - 30px );
 }
-#main-visualize-proteoforms-echarts {
+#main-visualize-proteoforms-variants-echart {
   background-color: #FAFAFC; 
   position: absolute;
   top: 50%;
