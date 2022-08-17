@@ -421,17 +421,19 @@ var POSITION_INFORMATION_ECHART;
  */
 
 /**
- * Methods that are executed once the application has loaded.
+ * Methods to be executed once the application has loaded.
  */
 window.onload = _ => {
-    // Populate HTML elements with functions.
-    document.getElementById("main-visualize_add_features_component").onchange = fileInputChange;
-    document.getElementById("main-menu_about_component").onclick = _ => toggleMainSubcomponent('about');
-    document.getElementById("main-menu_visualize_component").onclick = _ => toggleMainSubcomponent('visualize_overview');
-    document.getElementById("main-menu_legalnotice_component").onclick = _ => toggleMainSubcomponent('legal_notice');
-    document.getElementById("main-visualize_proteoforms_back_button").onclick = _ => toggleMainSubcomponent('visualize_overview');
+    // Assign functionality to button elements contained within the main-menu element.
+    document.getElementById("main-menu-linkvisualize").onclick = _ => toggleComponent('visualize-overview');
+    document.getElementById("main-menu-linklegalnotice").onclick = _ => toggleComponent('legalnotice');
+
+    // Assign functionality to elements contained within components.
+    document.getElementById("main-visualize-overview-fileinput").onchange = fileInputChange;
+    document.getElementById("main-visualize-proteoforms-backbutton").onclick = _ => toggleComponent('visualize-overview');
+
     // Initialize the `FEATURE_OVERVIEW_ECHART` component.
-    FEATURE_OVERVIEW_ECHART = echarts.init(document.getElementById("main-visualize_overview_feature_overview_echart_container"), { "renderer": "canvas" });
+    FEATURE_OVERVIEW_ECHART = echarts.init(document.getElementById("main-visualize-overview-echarts"), { "renderer": "canvas" });
     FEATURE_OVERVIEW_ECHART.setOption(STATE.featureOverviewEchartOption);
     FEATURE_OVERVIEW_ECHART.on('click', function (params) {
         let selectedFeatureName = params.data.name;
@@ -443,7 +445,7 @@ window.onload = _ => {
             if (STATE.vDict.features[selectedFeatureName].allocatedProtein !== {}) {
                 items.push({
                     type: 'button', label: 'Explore Proteoforms (' + Object.keys(STATE.vDict.features[selectedFeatureName].allocatedProtein.proteoforms).length + ')', onClick: () => {
-                        toggleMainSubcomponent('visualize_proteoforms');
+                        toggleComponent('visualize-proteoforms');
                         PROTEOFORM_VARIANTS_ECHART_setChain('A');
                         PROTEIN_STRUCTURE_VIEWER_setSelectedFeature( );
                     }
@@ -457,15 +459,17 @@ window.onload = _ => {
             selectedFeatureName = null;
         }
         STATE.selectedFeature = selectedFeatureName;
-        document.getElementById("main-visualize_proteoforms_selected_feature_name").innerHTML = selectedFeatureName;
+        document.getElementById("main-visualize-proteoforms-featureinformation").innerHTML = selectedFeatureName;
     });
+
     // Initialize the `PROTEIN_STRUCTURE_VIEW` component.
     PROTEIN_STRUCTURE_VIEWER = $3Dmol.createViewer(
-        $('#main-visualize_proteoforms_structure_viewer_3dmol_container'),
+        $('#main-visualize-proteoforms-3dmol'),
         { backgroundColor: '#FAFAFC', id: 'PROTEIN_STRUCTURE_VIEW_CANVAS', antialias: true, cartoonQuality: 6 }
     );
+
     // Initialize the `PROTEOFORM_VARIANTS_ECHART` component.
-    PROTEOFORM_VARIANTS_ECHART = echarts.init(document.getElementById("main-visualize_proteoforms_variants_viewer_echart_container"), { "renderer": "canvas", "width": 'auto', "height": 'auto' });
+    PROTEOFORM_VARIANTS_ECHART = echarts.init(document.getElementById("main-visualize-proteoforms-echarts"), { "renderer": "canvas", "width": 'auto', "height": 'auto' });
     STATE.proteoformVariantsEchartOption.toolbox.feature["myTool1"] = {
         show: true,
         title: 'Proteoform Filters',
@@ -527,6 +531,7 @@ window.onload = _ => {
         }
     };
     PROTEOFORM_VARIANTS_ECHART.setOption(STATE.proteoformVariantsEchartOption);
+
     // Initialize the `POSITION_INFORMATION_ECHART` component.
     STATE.proteoformVariantsEchartOption.tooltip.formatter = (p) => {
         if (p.seriesIndex === 0) {
@@ -550,11 +555,11 @@ window.onload = _ => {
                     <p>Relative Position <b>` + position + `</b></p>
                     <p>Variant <b>` + AMINO_ACID_DESIGNATION[wildTypeResidue] + ` &#8594; ` + AMINO_ACID_DESIGNATION[mutatedResidue] + `</b></p>
                     <p>Total Number of Variants <b>` + noVariants + `</b></p>
-                    <div id="position_information_echart_container" style="width: 340px; height: 230px;"></div>
+                    <div id="main-visualize-proteoforms-positioninformation-echarts" style="width: 340px; height: 230px;"></div>
                 </div>
             `;
-            document.getElementById("main-visualize_proteoforms_position_information_container").innerHTML = html;
-            POSITION_INFORMATION_ECHART = echarts.init(document.getElementById("position_information_echart_container"), { "renderer": "canvas" });
+            document.getElementById("main-visualize-proteoforms-positioninformation").innerHTML = html;
+            POSITION_INFORMATION_ECHART = echarts.init(document.getElementById("main-visualize-proteoforms-positioninformation-echarts"), { "renderer": "canvas" });
             STATE.positionVariantCompositionEchartOption.series[0].data = [];
             for (let [key, value] of Object.entries(positionComposition)) {
                 STATE.positionVariantCompositionEchartOption.series[0].data.push({
@@ -569,77 +574,44 @@ window.onload = _ => {
             POSITION_INFORMATION_ECHART.setOption(STATE.positionVariantCompositionEchartOption);
             PROTEIN_STRUCTURE_VIEWER_highlightResidue(position.split("+")[0], true);
         } else {
-            document.getElementById("main-visualize_proteoforms_position_information_container").innerHTML = "";
+            document.getElementById("main-visualize-proteoforms-positioninformation").innerHTML = "";
         }
     }
 };
 
 /**
- * Sets the value of an existing option in the `SETTINGS` variable.
+ * Hides the specified component.
  * 
- * @param {Text} key    The `key`, i.e. name, of an option to change. 
- * @param {Text} value  The value the accessed option should be set to.
+ * @param {string} - Value of the html id attribute of the component to hide. 
  */
-function setSetting(key, value) {
-    if (key in SETTINGS) {
-        SETTINGS.key = value;
-        if (SETTINGS._verbose) {
-            console.info("Successfully changed value of SETTINGS stored at key " + key + " to " + value);
-        }
-    } else {
-        if (SETTINGS._verbose) {
-            console.warn("Failed to change value of SETTINGS stored at key " + key + "; " + key + " is no valid SETTINGS name.");
-        }
-        return null;
+function hideComponent(id) {
+    document.getElementById(id) ? document.getElementById(id).style.display = "none" : null;
+}
+
+/**
+ * Displays the specified component.
+ * 
+ * @param {string} id - Value of the html id attribute of the component to display.
+ * @param {string} s - CSS style value to use for displaying the component. Default is `block`.
+ */
+function displayComponent(id, s) {
+    if ( s === null ) {
+        s = 'block';
     }
+    document.getElementById(id) ? document.getElementById(id).style.display = s : null;
 }
 
 /**
- * Returns the value of an existing option in the `SETTINGS` variable.
+ * Displays the specified component. All other components are hidden.
  * 
- * @param {Text} key    The `key`, i.e. name, of an option (which value is returned).
+ * @param {string} id - Value of the html id attribute of the component to display.
  */
-function getSetting(key) {
-    if (key in SETTINGS) {
-        return SETTINGS.key;
-    } else {
-        if (SETTINGS._verbose) {
-            console.warn("Accessed value stored at key " + key + " but " + key + " is no valid SETTINGS name.");
-        }
-        return null;
-    }
-}
-
-/**
- * Closes the specified element.
- * 
- * @param {Text} elementId 
- */
-function closeElement(elementId) {
-    document.getElementById(elementId) ? document.getElementById(elementId).style.display = "none" : null;
-}
-
-/**
- * Shows the specified element with the specified display style.
- * 
- * @param {Text} elementId 
- * @param {Text} style 
- */
-function showElement(elementId, style) {
-    document.getElementById(elementId) ? document.getElementById(elementId).style.display = style : null;
-}
-
-/**
- * Shows the specified main subcomponent, i.e. others are closed.
- * 
- * @param {Text} componentId
- */
-function toggleMainSubcomponent(componentId) {
-    for (let key of ["about", "visualize_overview", "visualize_proteoforms", "settings", "legal_notice"]) {
-        if (componentId === key) {
-            showElement("main-" + key, "block");
+function toggleComponent(id) {
+    for (let key of ["visualize-overview", "visualize-proteoforms", "legalnotice"]) {
+        if (id === key) {
+            displayComponent("main-" + key, "block");
         } else {
-            closeElement("main-" + key);
+            hideComponent("main-" + key);
         }
     }
 }
@@ -650,7 +622,7 @@ function toggleMainSubcomponent(componentId) {
  * @param {event} event: File selection event. The `target` of the event has to be a file input element with a `files` attribute yielding a `FileList` instance. 
  */
 function fileInputChange() {
-    initializeState(document.getElementById("main-visualize_add_features_component").files[0]);
+    initializeState(document.getElementById("main-visualize-overview-fileinput").files[0]);
 }
 
 /**
@@ -683,21 +655,4 @@ function initializeState(file) {
             500
         );
     }
-}
-
-/* UTILITY METHODS */
-
-/**
- * 
- * @param {*} object 
- * @param {*} sortBy 
- * @returns 
- */
-function sortObject(object, sortBy) {
-    let sortedObject = {};
-    for (let key of Object.keys(object).sort(sortBy)) {
-        sortedObject[key] = object[key];
-    };
-    console.log(sortedObject);
-    return sortedObject;
 }
