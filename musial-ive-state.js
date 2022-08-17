@@ -133,7 +133,7 @@ export const AMINO_ACID_COLOR = {
     "noSamples": null,
     "featureOverviewEchartOption": {
         title: {
-            text: 'Leaf Node Color: Percentage of Variant Positions',
+            text: 'Leaf Node Size: No. Proteoforms; ln( #PF )² | Leaf Node Color: Percentage of Variant Positions',
             bottom: '5%',
             right: 'center',
             textStyle: {

@@ -32,13 +32,7 @@ function FEATURE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
     let clsLevelNode;
     let ftrLevelNode;
     let computeSymbolSize = (noPf) => {
-        if (noPf < 10) {
-            return Math.round(10 - Math.pow(Math.log(noPf), 1.5));
-        } else if (noPf < 20) {
-            return noPf;
-        } else {
-            return Math.round(20 + Math.pow(Math.log(noPf), 1.5));
-        }
+        return Math.max( 5, Math.round(Math.pow(Math.log(noPf), 2)) );
     };
     if (featureOverviewData.filter(node => node.name == chr).length == 0) {
         chrLevelNode = {
