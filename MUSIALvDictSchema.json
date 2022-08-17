@@ -177,9 +177,7 @@
                                 "description": "Additional meta-information about the proteoform.",
                                 "type": "string"
                               },
-                              "required": [
-                                "cause"
-                              ]
+                              "required": [ ]
                             },
                             "occurrence": {
                               "description": "List of all proteoforms names that yield this variant.",
