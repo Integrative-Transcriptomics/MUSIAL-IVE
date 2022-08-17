@@ -20,6 +20,8 @@
 import { STATE, AMINO_ACID_ENCODING, AMINO_ACID_DECODING, AMINO_ACID_DESIGNATION, AMINO_ACID_COLOR } from './musial-ive-state.js';
 import { SETTINGS } from './musial-ive-settings.js';
 
+var SCHEMA_VALIDATOR;
+
 var FEATURE_OVERVIEW_ECHART;
 /**
  * METHODS TO MANIPULATE AND INTERACT WITH `FEATURE_OVERVIEW_ECHART`
@@ -424,6 +426,12 @@ var POSITION_INFORMATION_ECHART;
  * Methods to be executed once the application has loaded.
  */
 window.onload = _ => {
+    // Fetch local json schema and initialize json validator with it (used to validate loaded .vdict.json files).
+    fetch( "./MUSIALvDictSchema.json" ).then( content => content.json( ) ).then( promise => {
+        SCHEMA_VALIDATOR = new djv( );
+        SCHEMA_VALIDATOR.addSchema( 'MUSIAL_VDICT_SCHEMA', promise );
+    } );
+
     // Assign functionality to button elements contained within the main-menu element.
     document.getElementById("main-menu-linkvisualize").onclick = _ => toggleComponent('visualize-overview');
     document.getElementById("main-menu-linklegalnotice").onclick = _ => toggleComponent('legalnotice');
@@ -635,13 +643,42 @@ function initializeState(file) {
     var fileContent;
     fileReader.onload = function (event) {
         fileContent = event.target.result;
-        STATE.vDict = JSON.parse(fileContent);
+        let parsedContent = JSON.parse(fileContent);
+        let validationResponse = SCHEMA_VALIDATOR.validate( 'MUSIAL_VDICT_SCHEMA', parsedContent );
+        if ( validationResponse === undefined ) {
+            STATE.vDict = parsedContent;
+        } else {
+            let dataPath = validationResponse.dataPath.split( "'" ).filter( e => e !== '' && e.indexOf( ')' ) == -1 && e.indexOf( '(' ) == -1 && e.indexOf( ']' ) == -1 && e.indexOf( '[' ) == -1 && e.indexOf( 'decodeURIComponent' ) == -1 );
+            console.log( dataPath );
+            dataPath = dataPath.map( e => {
+                if ( e.indexOf( '+i' ) !== -1 ) {
+                    return 'ITEM';
+                } else {
+                    return e;
+                }
+            } );
+            console.log( dataPath );
+            Swal.fire( {
+                icon: 'error',
+                title: 'Input Validation Failed!',
+                text: 'The validation of the uploaded variants dictionary failed; missing required properties in the following data path:',
+                html: `
+                <p>The validation of the uploaded variants dictionary failed; missing required properties in the following data path:</p>
+                <p>` + dataPath.join( ' <i class="fa-solid fa-caret-right"></i> ' ) + `</p>
+                `,
+                width: '50%',
+                height: '50%'
+            } );
+        }
     };
     if (file !== undefined) {
         fileReader.readAsText(file);
         // Add features parsed from a `.vDict.json` file to the `STATE`.
         window.setTimeout(
             _ => {
+                if ( STATE.vDict === null ) {
+                    return;
+                }
                 let chr = STATE.vDict.chromosome;
                 let fileName = file.name.split('.')[0];
                 for (const [ftrName, ftrObj] of Object.entries(STATE.vDict.features)) {
