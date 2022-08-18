@@ -159,6 +159,10 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature() {
     // Zoom to the model and render it.
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.zoomTo();
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.render();
+    // Highlight residue, if any is selected.
+    if ( STATE.mainVisualizeProteoformsSelectedResidue[ STATE.mainVisualizeSelectedFeature ] !== undefined ) {
+        MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightResidue( STATE.mainVisualizeProteoformsSelectedResidue[ STATE.mainVisualizeSelectedFeature ], true );
+    }
 };
 
 /**
