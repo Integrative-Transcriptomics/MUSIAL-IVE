@@ -124,17 +124,21 @@ export const AMINO_ACID_COLOR = {
  export var STATE = {
     // vDict: Object; A variants dictionary (<FILENAME>.vdict.json) output by MUSIAL. 
     "vDict": null,
-    // selectedFeature: String; Currently selected (genomic) feature.
-    "selectedFeature": null,
-    // selectedChain: String, Currently selected chain.
-    "selectedChain": null,
-    // selectedResidue: Object, Selected residue per feature.
-    "selectedResidue": { },
-
-    "perPositionVariantInformation": {},
-    "perProteoformMetaInformation": {},
-    "noProteoforms": null,
-    "noSamples": null,
+    // mainVisualizeSelectedFeature: String; Currently selected (genomic) feature.
+    "mainVisualizeSelectedFeature": null,
+    // mainVisualizeProteoformsSelectedChain: String; Currently selected chain.
+    "mainVisualizeProteoformsSelectedChain": null,
+    // mainVisualizeProteoformsSelectedResidue: Object; Selected residue per feature.
+    "mainVisualizeProteoformsSelectedResidue": { },
+    // mainVisualizeProteoformsPositionInformation: Object; Stores information about variants per position.
+    "mainVisualizeProteoformsPositionInformation": {},
+    // mainVisualizeProteoformsMetaInformation: Object; Stores meta-information about proteoforms.
+    "mainVisualizeProteoformsMetaInformation": {},
+    // mainVisualizeProteoformsNoProteoforms: null or int; The number of proteoforms of the selected feature.
+    "mainVisualizeProteoformsNoProteoforms": null,
+    // mainVisualizeProteoformsNoSamples: null or int; The number of samples of the selected feature.
+    "mainVisualizeProteoformsNoSamples": null,
+    // mainVisualizeOverviewEchart: Object; Echart option specification for the overview echart.
     "mainVisualizeOverviewEchart": {
         title: {
             text: 'Leaf Node Size: No. Proteoforms | Leaf Node Color: Percentage of Variant Positions',
@@ -201,6 +205,7 @@ export const AMINO_ACID_COLOR = {
             }
         ]
     },
+    // mainVisualizeProteoformsVariantsEchart: Object; Echart option specification for the per proteoform variants echart.
     "mainVisualizeProteoformsVariantsEchart": {
         title: [ ],
         grid: [
@@ -508,6 +513,7 @@ export const AMINO_ACID_COLOR = {
             }
         ]
     },
+    // mainVisualizeProteoformsPositioninformationEchart: Object; Echart option specification for the position information echart.
     "mainVisualizeProteoformsPositioninformationEchart": {
         legend: {
             type: 'scroll',

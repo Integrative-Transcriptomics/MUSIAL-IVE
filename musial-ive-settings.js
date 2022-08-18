@@ -19,9 +19,9 @@
     // _verbose: Boolean; Whether to output user information (currently unused).
     "_verbose": true,
     "_main_visualize_proteoforms_truncateAfterFirstTermination": true,
-    "_PROTEOFORMFILTER_EXCLUDEPT": false,
-    "_PROTEOFORMFILTER_MINVP": 0.0,
-    "_PROTEOFORMFILTER_MINSP": 0.0,
-    "_PROTEOFORMFILTER_CONSIDEREDPF": [ ],
-    "_PROTEOFORMFILTER_CONSIDEREDSAMPLES": [ ]
+    "_main_visualize_proteoforms_excludePFWithInternalTermination": false,
+    "_main_visualize_proteoforms_PFMinVarPosPerc": 0.0,
+    "_main_visualize_proteoforms_PFMinNoSamples": 0.0,
+    "_main_visualize_proteoforms_explicitPFs": [ ],
+    "_main_visualize_proteoforms_explicitSamples": [ ]
 };
