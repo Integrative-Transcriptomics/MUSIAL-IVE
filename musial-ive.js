@@ -442,6 +442,16 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
  * Returns the HTML string content to display for the proteoform filter tool.
  */
 function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getFilterHTML( ) {
+    // Extract set `excludePFWithInternalTermination` value from SETTINGS.
+    let settingsExcludePTPFschecked = SETTINGS._main_visualize_proteoforms_excludePFWithInternalTermination ? "checked" : "";
+    // Extract set `explicit` value from SETTINGS.
+    let settingExplicitValue = "";
+    if ( SETTINGS._main_visualize_proteoforms_explicitSamples.length > 0 ) {
+        settingExplicitValue += SETTINGS._main_visualize_proteoforms_explicitSamples.join( " " );
+    }
+    if ( SETTINGS._main_visualize_proteoforms_explicitPFs.length > 0 ) {
+        settingExplicitValue += " " + SETTINGS._main_visualize_proteoforms_explicitPFs.join( " " );
+    }
     return `
     <div>
         <table class="table row-border" data-role="table" data-rows="10" data-show-pagination="false" data-show-search="false" data-show-table-info="false" data-show-rows-steps="false">
@@ -454,24 +464,32 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getFilterHTML( ) {
             <tbody>
                 <tr>
                     <td>Exlude Proteoforms with Premature Termination</td>
-                    <td><input id="tmp-visualize-proteoforms-setting-excludePFWithInternalTermination" type="checkbox" data-role="switch"></td>
+                    <td><input id="tmp-visualize-proteoforms-setting-excludePFWithInternalTermination" type="checkbox" data-material="true" data-cls-check="bd-red" data-role="switch"` + settingsExcludePTPFschecked + `></td>
                 </tr>
                 <tr>
                     <td>Min. Percentage of Variable Positions</td>
-                    <td><br><input id="tmp-visualize-proteoforms-setting-PFMinVarPosPerc" data-show-min-max="true" data-accuracy="0.1" data-role="slider" data-hint="true" data-hint-position="top"></td>
+                    <td><br><input id="tmp-visualize-proteoforms-setting-PFMinVarPosPerc" class="input-small" data-min-value="0.0" data-max-value="100.0" data-fixed="1" data-step="0.1" data-role="spinner"></td>
                 </tr>
                 <tr>
                     <td>Min. No. Samples</td>
-                    <td><br><input id="tmp-visualize-proteoforms-setting-PFMinNoSamples" data-value="1" data-return-type="value" data-show-min-max="true" data-min="1" data-max="` +  Object.keys( STATE.vDict.samples ).length + `" data-accuracy="1" data-role="slider" data-hint="true" data-hint-position="top"></td>
+                    <td><br><input id="tmp-visualize-proteoforms-setting-PFMinNoSamples" class="input-small" data-min-value="0" data-max-value="` + Object.keys( STATE.vDict.samples ).length + `" data-fixed="0" data-step="1" data-role="spinner"></td>
                 </tr>
                 <tr>
                     <td>Include Only</td>
-                    <td><input id="tmp-visualize-proteoforms-setting-explicit" type="text" data-role="taginput" data-tag-trigger="Space"></td>
+                    <td><input id="tmp-visualize-proteoforms-setting-explicit" type="text" data-role="taginput" data-tag-trigger="Space" value="` + settingExplicitValue + `" data-autocomplete="Foo"></td>
                 </tr>
             </tbody>
         </table>
     </div>
     `
+}
+
+/**
+ * Resets all proteoform filters to default values.
+ */
+function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_resetFeatureSpecificProteoformFilters( ) {
+    SETTINGS._main_visualize_proteoforms_PFMinNoSamples = 0;
+    SETTINGS._main_visualize_proteoforms_explicitPFs = [ ];
 }
 
 /**
@@ -538,6 +556,7 @@ window.onload = _ => {
                 items.push({
                     type: 'button', label: 'Explore Proteoforms (' + Object.keys(STATE.vDict.features[selectedFeatureName].allocatedProtein.proteoforms).length + ')', onClick: () => {
                         toggleComponent('visualize-proteoforms');
+                        MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_resetFeatureSpecificProteoformFilters( );
                         MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain('A');
                         MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature( );
                     }
@@ -574,11 +593,16 @@ window.onload = _ => {
                 color: '#6d81ad',
                 background: '#EFF0F8',
                 html: MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getFilterHTML( ),
-                backdrop: `rgba(96, 113, 150, 0.4) no-repeat`
+                didOpen: ( ) => {
+                    Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinVarPosPerc" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinVarPosPerc );
+                    Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinNoSamples" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinNoSamples );
+                },
+                backdrop: 'rgba(139, 140, 148, 0.5) no-repeat',
+                confirmButtonColor: '#6d81ad'
             }).then( _ => {
                 SETTINGS._main_visualize_proteoforms_excludePFWithInternalTermination =  $( "#tmp-visualize-proteoforms-setting-excludePFWithInternalTermination" ).is(':checked');
                 SETTINGS._main_visualize_proteoforms_PFMinVarPosPerc = parseFloat( document.getElementById( "tmp-visualize-proteoforms-setting-PFMinVarPosPerc" ).value );
-                SETTINGS._main_visualize_proteoforms_PFMinNoSamples = parseFloat( document.getElementById( "tmp-visualize-proteoforms-setting-PFMinNoSamples" ).value );
+                SETTINGS._main_visualize_proteoforms_PFMinNoSamples = parseInt( document.getElementById( "tmp-visualize-proteoforms-setting-PFMinNoSamples" ).value );
                 SETTINGS._main_visualize_proteoforms_explicitPFs = [ ];
                 SETTINGS._main_visualize_proteoforms_explicitSamples = [ ];
                 for ( let considered of document.getElementById( "tmp-visualize-proteoforms-setting-explicit" ).value.split( "," ) ) {

@@ -21,7 +21,7 @@
     "_main_visualize_proteoforms_truncateAfterFirstTermination": true,
     "_main_visualize_proteoforms_excludePFWithInternalTermination": false,
     "_main_visualize_proteoforms_PFMinVarPosPerc": 0.0,
-    "_main_visualize_proteoforms_PFMinNoSamples": 0.0,
+    "_main_visualize_proteoforms_PFMinNoSamples": 1,
     "_main_visualize_proteoforms_explicitPFs": [ ],
     "_main_visualize_proteoforms_explicitSamples": [ ]
 };

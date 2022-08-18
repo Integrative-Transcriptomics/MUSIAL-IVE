@@ -16,10 +16,11 @@
 /* Definition of root properties and variables. */
 :root {
   font-family: Arial, Helvetica, sans-serif, 'Genos';
-  --background-color: #EFF0F8;
+  --background-color: #eff0f8;
   --background-color-2: #E4E5ED;
   --background-color-3: #fafafc;
   --background-color-4: #f0f0f3;
+  --background-color-dark: rgb(139, 140, 148);
   --color-1: #607196;
   --color-2: #cbd0e0;
   --color-3: #8197cc;
@@ -45,6 +46,10 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-1);
+}
+body.swal2-shown > [aria-hidden="true"] {
+  transition: 0.5s filter;
+  filter: blur(2px);
 }
 .noDecoration {
   background-color: transparent;
