@@ -176,11 +176,21 @@ body.swal2-shown > [aria-hidden="true"] {
   border-radius: 2px;
   background-color: var(--background-color-4); 
   position: absolute;
-  top: 56px;
-  left: 20px;
+  top: 25px;
+  right: 20px;
   padding: 2px;
   width: 18%;
-  height: calc( 45% - 30px );
+  height: calc( 50% - 50px );
+}
+#main-visualize-proteoforms-positioninformation-closebutton {
+  display: block;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  color: var(--color-1);
+}
+#main-visualize-proteoforms-positioninformation-closebutton:hover {
+  color: var(--color-4);
 }
 #main-visualize-proteoforms-variants-echart {
   background-color: #FAFAFC; 

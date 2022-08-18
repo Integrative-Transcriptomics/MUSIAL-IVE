@@ -117,31 +117,24 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature() {
     // Clear current model, add protein model of currently selected feature and apply default cartoon style.
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.clear( );
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.addModel(STATE.vDict.features[STATE.mainVisualizeSelectedFeature].allocatedProtein.pdb, "pdb");
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL_applyDefaultStyle( );
+    // Zoom to the model.
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL.zoomTo( );
+};
+
+/**
+ * Applies default cartoon style with coloring based on the number of variants per position to the loaded model.
+ */
+function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_applyDefaultStyle( ) {
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.setStyle(
         {
-
-        },
-        {
-            cartoon: {
-                color: '#E7E7E4',
-                opacity: 0.95,
-                thickness: 0.2,
-                arrows: true
-            }
-        }
-    );
-    // Select all positions that are actually reflected in the protein structure and color them according to the number of different variants.
-    MAIN_VISUALIZE_PROTEOFORMS_3DMOL.addStyle(
-        {
-            resi: STATE.mainVisualizeProteoformsVariantsEchart.series[1].data
-                .filter(v => { return v[1] > 1 && v[0].split("+")[1] === "0" })
-                .map(v => { return v[0].split("+")[0] })
+            // Select all residues.
         },
         {
             cartoon: {
                 colorfunc: (atom) => {
                     let noVariants = STATE.mainVisualizeProteoformsVariantsEchart.series[1].data.filter(v => { return v[0] === atom.resi + "+0" })[0][1];
-                    let clr;
+                    let clr = '#E7E7E4';
                     if (noVariants == 2) {
                         clr = '#9c73af';
                     } else if (noVariants > 2 && noVariants <= 4) {
@@ -152,71 +145,35 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature() {
                         clr = '#ffa600';
                     }
                     return clr;
-                }
+                },
+                opacity: 0.95,
+                thickness: 0.2,
+                arrows: true
             }
         }
     );
-    // Zoom to the model and render it.
-    MAIN_VISUALIZE_PROTEOFORMS_3DMOL.zoomTo();
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.render();
-    // Highlight residue, if any is selected.
-    if ( STATE.mainVisualizeProteoformsSelectedResidue[ STATE.mainVisualizeSelectedFeature ] !== undefined ) {
-        MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightResidue( STATE.mainVisualizeProteoformsSelectedResidue[ STATE.mainVisualizeSelectedFeature ], true );
-    }
-};
+}
 
 /**
  * Highlights a specific residue (determined by the residue index/position) of the currently displayed model.
- * 
- * @param {string} position - Position, i.e., residue index (resi) of the position to highlight. 
- * @param {boolean} reset - Whether to reset previous selection. 
  */
-function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightResidue(position, reset) {
-    if (reset) {
-        MAIN_VISUALIZE_PROTEOFORMS_3DMOL.setStyle(
+function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightSelectedPosition( ) {
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL_applyDefaultStyle( );
+    let selection = STATE.mainVisualizeProteoformsSelection[ STATE.mainVisualizeSelectedFeature ];
+    if ( selection != undefined && selection != null ) {
+        MAIN_VISUALIZE_PROTEOFORMS_3DMOL.addStyle(
             {
-                resi: STATE.mainVisualizeProteoformsSelectedResidue[ STATE.mainVisualizeSelectedFeature ]
+                resi: selection.name.split( "+" )[ 0 ]
             },
             {
-                cartoon: {
-                    color: '#FFFFFF',
-                    thickness: 0.2,
-                    arrows: true
-                },
-                cartoon: {
-                    colorfunc: (atom) => {
-                        let noVariants = STATE.mainVisualizeProteoformsVariantsEchart.series[1].data.filter(v => { return v[0] === atom.resi + "+0" })[0][1];
-                        let clr;
-                        if (noVariants == 2) {
-                            clr = '#9c73af';
-                        } else if (noVariants > 2 && noVariants <= 4) {
-                            clr = '#e56b9d';
-                        } else if (noVariants > 4 && noVariants <= 8) {
-                            clr = '#ff7764';
-                        } else if (noVariants > 8) {
-                            clr = '#ffa600';
-                        }
-                        return clr;
-                    }
+                stick: {
+                    colorfunc: _ => '#FF5C43',
+                    radius: 1
                 }
             }
         );
-        STATE.mainVisualizeProteoformsSelectedResidue[ STATE.mainVisualizeSelectedFeature ] = null;
     }
-    MAIN_VISUALIZE_PROTEOFORMS_3DMOL.addStyle(
-        {
-            resi: position
-        },
-        {
-            stick: {
-                colorfunc: (atom) => {
-                    return '#FF5C43';
-                },
-                radius: 1
-            }
-        }
-    );
-    STATE.mainVisualizeProteoformsSelectedResidue[ STATE.mainVisualizeSelectedFeature ] = position;
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.render();
 };
 
@@ -530,6 +487,57 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getPositionComposition(p) {
 /* METHODS TO MANIPULATE AND INTERACT WITH `POSITION_INFORMATION_ECHART` */
 var MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART;
 
+/**
+ * Opens the position information dialog with the specified selection object. The selection object has to comprise a name property that represents
+ * the selected position in string format X+Y (i.e. residue position + inserted positions) and a data property that represents the data stored in
+ * a cell of the variants heatmap, i.e., [ POSITION_INDEX, PROTEOFORM_INDEX, CONTENT_ENCODING ]
+ * 
+ * @param {object} selection - Object describing a selected cell in the variants heatmap.
+ */
+function MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_openDialog( selection ) {
+    let position = selection.name;
+    let proteoformName = STATE.mainVisualizeProteoformsVariantsEchart.yAxis[0].data[selection.data[1]];
+    let mutatedResidue = AMINO_ACID_DECODING[selection.data[2]];
+    let wildTypeResidue;
+    if (position.split("+")[1] === "0") {
+        wildTypeResidue = AMINO_ACID_DECODING[STATE.mainVisualizeProteoformsVariantsEchart.series[0].data.filter(e => e[0] == selection.data[0] && e[1] == STATE.mainVisualizeProteoformsVariantsEchart.yAxis[0].data.indexOf("Wild Type Gene"))[0][2]];
+    } else {
+        wildTypeResidue = "None";
+    }
+    let noVariants = STATE.mainVisualizeProteoformsVariantsEchart.series[1].data.filter(e => e[0] == position)[0][1]
+    let positionComposition = MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getPositionComposition(position);
+    $( '#main-visualize-proteoforms-positioninformation-proteoformID' ).html( 'Proteoform <b>' + proteoformName + '</b>' );
+    $( '#main-visualize-proteoforms-positioninformation-noSamples' ).html( 'No. Samples <b>' + STATE.vDict.features[ STATE.mainVisualizeSelectedFeature ].allocatedProtein.proteoforms[ proteoformName ].samples.length + '</b>' );
+    $( '#main-visualize-proteoforms-positioninformation-position' ).html( 'Relative Position <b>' + position + '</b>' );
+    $( '#main-visualize-proteoforms-positioninformation-variant' ).html( 'Variant <b>' + AMINO_ACID_DESIGNATION[wildTypeResidue] + ' &#8594; ' + AMINO_ACID_DESIGNATION[mutatedResidue] + '</b>' );
+    $( '#main-visualize-proteoforms-positioninformation-noVariants' ).html( 'No. Variants <b>' + noVariants + '</b>' );
+    MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART = echarts.init(document.getElementById("main-visualize-proteoforms-positioninformation-echart"), { "renderer": "canvas" });
+    STATE.mainVisualizeProteoformsPositioninformationEchart.series[0].data = [];
+    for (let [key, value] of Object.entries(positionComposition)) {
+        STATE.mainVisualizeProteoformsPositioninformationEchart.series[0].data.push({
+            name: AMINO_ACID_DESIGNATION[key] + ", " + value + " of " + Object.values(positionComposition).reduce((i1, i2) => i1 + i2),
+            value: value,
+            itemStyle: {
+                color: AMINO_ACID_COLOR[key],
+                borderWidth: key === mutatedResidue ? 5 : 0
+            }
+        });
+    }
+    MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART.setOption(STATE.mainVisualizeProteoformsPositioninformationEchart);
+    STATE.mainVisualizeProteoformsSelection[ STATE.mainVisualizeSelectedFeature ] = { "name": selection.name, "data": selection.data };
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightSelectedPosition( );
+    displayComponent( "main-visualize-proteoforms-positioninformation", "block" );
+}
+
+/**
+ * Closes the position information dialog an resets its content as well as any selection.
+ */
+function MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_closeDialog( ) {
+    STATE.mainVisualizeProteoformsSelection[ STATE.mainVisualizeSelectedFeature ] = null;
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightSelectedPosition( );
+    hideComponent("main-visualize-proteoforms-positioninformation");
+}
+
 /* Methods to be executed once the application has loaded. */
 window.onload = _ => {
     // Fetch local json schema and initialize json validator with it (used to validate loaded .vdict.json files).
@@ -545,6 +553,7 @@ window.onload = _ => {
     // Assign functionality to elements contained within components.
     document.getElementById("main-visualize-overview-fileinput").onchange = fileInputChange;
     document.getElementById("main-visualize-proteoforms-backbutton").onclick = _ => toggleComponent('visualize-overview');
+    document.getElementById("main-visualize-proteoforms-positioninformation-closebutton").onclick = _ => MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_closeDialog( );
 
     // Initialize the `MAIN_VISUALIZE_OVERVIEW_ECHART` component.
     MAIN_VISUALIZE_OVERVIEW_ECHART = echarts.init(document.getElementById("main-visualize-overview-echart"), { "renderer": "canvas" });
@@ -559,10 +568,20 @@ window.onload = _ => {
             if (STATE.vDict.features[selectedFeatureName].allocatedProtein !== {}) {
                 items.push({
                     type: 'button', label: 'Explore Proteoforms (' + Object.keys(STATE.vDict.features[selectedFeatureName].allocatedProtein.proteoforms).length + ')', onClick: () => {
+                        STATE.mainVisualizeSelectedFeature = selectedFeatureName;
+                        document.getElementById("main-visualize-proteoforms-featureinformation").innerHTML = selectedFeatureName;
                         toggleComponent('visualize-proteoforms');
                         MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_resetFeatureSpecificProteoformFilters( );
                         MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain('A');
                         MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature( );
+                        // Reset previous selection information.
+                        let selection = STATE.mainVisualizeProteoformsSelection[ STATE.mainVisualizeSelectedFeature ];
+                        if ( selection != undefined && selection != null ) {
+                            MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_openDialog( selection );
+                            MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightSelectedPosition( );
+                        } else {
+                            MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_closeDialog( );
+                        }
                     }
                 });
             }
@@ -570,11 +589,7 @@ window.onload = _ => {
                 items: items,
                 width: '182px'
             });
-        } else {
-            selectedFeatureName = null;
         }
-        STATE.mainVisualizeSelectedFeature = selectedFeatureName;
-        document.getElementById("main-visualize-proteoforms-featureinformation").innerHTML = selectedFeatureName;
     });
 
     // Initialize the `MAIN_VISUALIZE_PROTEOFORMS_3DMOL` component.
@@ -624,46 +639,9 @@ window.onload = _ => {
     MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart);
 
     // Initialize the `MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART` component.
-    STATE.mainVisualizeProteoformsVariantsEchart.tooltip.formatter = (p) => {
-        if (p.seriesIndex === 0) {
-            let position = p.name;
-            let proteoformName = STATE.mainVisualizeProteoformsVariantsEchart.yAxis[0].data[p.data[1]];
-            let mutatedResidue = AMINO_ACID_DECODING[p.data[2]];
-            let wildTypeResidue;
-            if (position.split("+")[1] === "0") {
-                wildTypeResidue = AMINO_ACID_DECODING[STATE.mainVisualizeProteoformsVariantsEchart.series[0].data.filter(e => e[0] == p.data[0] && e[1] == STATE.mainVisualizeProteoformsVariantsEchart.yAxis[0].data.indexOf("Wild Type Gene"))[0][2]];
-            } else {
-                wildTypeResidue = "None";
-            }
-            let sampleProportion = STATE.mainVisualizeProteoformsVariantsEchart.series[2].data[STATE.mainVisualizeProteoformsVariantsEchart.yAxis[0].data.indexOf(proteoformName)];
-            let noVariants = STATE.mainVisualizeProteoformsVariantsEchart.series[1].data.filter(e => e[0] == position)[0][1]
-            let positionComposition = MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getPositionComposition(position);
-            let html = `
-                <div>
-                    <p>Proteoform <b>` + proteoformName + `</b>&nbsp;(` + Math.round(sampleProportion * STATE.mainVisualizeProteoformsNoSamples) + ` sample(s))</p>
-                    <p>Relative Position <b>` + position + `</b></p>
-                    <p>Variant <b>` + AMINO_ACID_DESIGNATION[wildTypeResidue] + ` &#8594; ` + AMINO_ACID_DESIGNATION[mutatedResidue] + `</b></p>
-                    <p>Total Number of Variants <b>` + noVariants + `</b></p>
-                    <div id="main-visualize-proteoforms-positioninformation-echart" style="width: 340px; height: 230px;"></div>
-                </div>
-            `;
-            document.getElementById("main-visualize-proteoforms-positioninformation").innerHTML = html;
-            MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART = echarts.init(document.getElementById("main-visualize-proteoforms-positioninformation-echart"), { "renderer": "canvas" });
-            STATE.mainVisualizeProteoformsPositioninformationEchart.series[0].data = [];
-            for (let [key, value] of Object.entries(positionComposition)) {
-                STATE.mainVisualizeProteoformsPositioninformationEchart.series[0].data.push({
-                    name: AMINO_ACID_DESIGNATION[key] + ", " + value + " of " + Object.values(positionComposition).reduce((i1, i2) => i1 + i2),
-                    value: value,
-                    itemStyle: {
-                        color: AMINO_ACID_COLOR[key],
-                        borderWidth: key === mutatedResidue ? 5 : 0
-                    }
-                });
-            }
-            MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART.setOption(STATE.mainVisualizeProteoformsPositioninformationEchart);
-            MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightResidue(position.split("+")[0], true);
-        } else {
-            document.getElementById("main-visualize-proteoforms-positioninformation").innerHTML = "";
+    STATE.mainVisualizeProteoformsVariantsEchart.tooltip.formatter = ( content ) => {
+        if (content.seriesIndex === 0) {
+            MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_openDialog( content );
         }
     }
 };

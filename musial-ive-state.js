@@ -128,8 +128,8 @@ export const AMINO_ACID_COLOR = {
     "mainVisualizeSelectedFeature": null,
     // mainVisualizeProteoformsSelectedChain: String; Currently selected chain.
     "mainVisualizeProteoformsSelectedChain": null,
-    // mainVisualizeProteoformsSelectedResidue: Object; Selected residue per feature.
-    "mainVisualizeProteoformsSelectedResidue": { },
+    // mainVisualizeProteoformsSelection: Object; Selection information per feature.
+    "mainVisualizeProteoformsSelection": { },
     // mainVisualizeProteoformsPositionInformation: Object; Stores information about variants per position.
     "mainVisualizeProteoformsPositionInformation": { },
     // mainVisualizeProteoformsMetaInformation: Object; Stores meta-information about proteoforms.
