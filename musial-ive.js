@@ -402,7 +402,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
 /**
  * Returns the HTML string content to display for the proteoform filter tool.
  */
-function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getFilterHTML( ) {
+function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openFilterDialog( ) {
     // Extract set `excludePFWithInternalTermination` value from SETTINGS.
     let settingsExcludePTPFschecked = SETTINGS._main_visualize_proteoforms_excludePFWithInternalTermination ? "checked" : "";
     // Extract set `explicit` value from SETTINGS.
@@ -413,7 +413,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getFilterHTML( ) {
     if ( SETTINGS._main_visualize_proteoforms_explicitPFs.length > 0 ) {
         settingExplicitValue += " " + SETTINGS._main_visualize_proteoforms_explicitPFs.join( " " );
     }
-    return `
+    let htmlContent = `
     <div>
         <table class="table row-border" data-role="table" data-rows="10" data-show-pagination="false" data-show-search="false" data-show-table-info="false" data-show-rows-steps="false">
             <thead>
@@ -443,6 +443,35 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getFilterHTML( ) {
         </table>
     </div>
     `
+    Swal.fire({
+        title: 'Proteoform Filters',
+        width: 1200,
+        padding: '1%',
+        color: '#6d81ad',
+        background: '#EFF0F8',
+        html: htmlContent,
+        didOpen: ( ) => {
+            Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinVarPosPerc" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinVarPosPerc );
+            Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinNoSamples" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinNoSamples );
+        },
+        backdrop: 'rgba(139, 140, 148, 0.5) no-repeat',
+        confirmButtonColor: '#6d81ad'
+    }).then( _ => {
+        SETTINGS._main_visualize_proteoforms_excludePFWithInternalTermination =  $( "#tmp-visualize-proteoforms-setting-excludePFWithInternalTermination" ).is(':checked');
+        SETTINGS._main_visualize_proteoforms_PFMinVarPosPerc = parseFloat( document.getElementById( "tmp-visualize-proteoforms-setting-PFMinVarPosPerc" ).value );
+        SETTINGS._main_visualize_proteoforms_PFMinNoSamples = parseInt( document.getElementById( "tmp-visualize-proteoforms-setting-PFMinNoSamples" ).value );
+        SETTINGS._main_visualize_proteoforms_explicitPFs = [ ];
+        SETTINGS._main_visualize_proteoforms_explicitSamples = [ ];
+        for ( let considered of document.getElementById( "tmp-visualize-proteoforms-setting-explicit" ).value.split( "," ) ) {
+            if ( considered.startsWith( "PF" ) && considered in STATE.vDict.features[ STATE.mainVisualizeSelectedFeature ].allocatedProtein.proteoforms  ) {
+                SETTINGS._main_visualize_proteoforms_explicitPFs.push( considered );
+            } else if ( considered in STATE.vDict.samples ) {
+                SETTINGS._main_visualize_proteoforms_explicitSamples.push( considered );
+            }
+        }
+        MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain('A');
+        MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature( );
+    });
 }
 
 /**
@@ -553,6 +582,7 @@ window.onload = _ => {
     // Assign functionality to elements contained within components.
     document.getElementById("main-visualize-overview-fileinput").onchange = fileInputChange;
     document.getElementById("main-visualize-proteoforms-backbutton").onclick = _ => toggleComponent('visualize-overview');
+    document.getElementById("main-visualize-proteoforms-toolFilter").onclick = _ => MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openFilterDialog( );
     document.getElementById("main-visualize-proteoforms-positioninformation-closebutton").onclick = _ => MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_closeDialog( );
 
     // Initialize the `MAIN_VISUALIZE_OVERVIEW_ECHART` component.
@@ -600,42 +630,6 @@ window.onload = _ => {
 
     // Initialize the `MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART` component.
     MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART = echarts.init(document.getElementById("main-visualize-proteoforms-variants-echart"), { "renderer": "canvas", "width": 'auto', "height": 'auto' });
-    STATE.mainVisualizeProteoformsVariantsEchart.toolbox.feature["myTool1"] = {
-        show: true,
-        title: 'Proteoform Filters',
-        icon: 'path://M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z',
-        onclick: function () {
-            Swal.fire({
-                title: 'Proteoform Filters',
-                width: 1200,
-                padding: '1%',
-                color: '#6d81ad',
-                background: '#EFF0F8',
-                html: MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getFilterHTML( ),
-                didOpen: ( ) => {
-                    Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinVarPosPerc" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinVarPosPerc );
-                    Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinNoSamples" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinNoSamples );
-                },
-                backdrop: 'rgba(139, 140, 148, 0.5) no-repeat',
-                confirmButtonColor: '#6d81ad'
-            }).then( _ => {
-                SETTINGS._main_visualize_proteoforms_excludePFWithInternalTermination =  $( "#tmp-visualize-proteoforms-setting-excludePFWithInternalTermination" ).is(':checked');
-                SETTINGS._main_visualize_proteoforms_PFMinVarPosPerc = parseFloat( document.getElementById( "tmp-visualize-proteoforms-setting-PFMinVarPosPerc" ).value );
-                SETTINGS._main_visualize_proteoforms_PFMinNoSamples = parseInt( document.getElementById( "tmp-visualize-proteoforms-setting-PFMinNoSamples" ).value );
-                SETTINGS._main_visualize_proteoforms_explicitPFs = [ ];
-                SETTINGS._main_visualize_proteoforms_explicitSamples = [ ];
-                for ( let considered of document.getElementById( "tmp-visualize-proteoforms-setting-explicit" ).value.split( "," ) ) {
-                    if ( considered.startsWith( "PF" ) && considered in STATE.vDict.features[ STATE.mainVisualizeSelectedFeature ].allocatedProtein.proteoforms  ) {
-                        SETTINGS._main_visualize_proteoforms_explicitPFs.push( considered );
-                    } else if ( considered in STATE.vDict.samples ) {
-                        SETTINGS._main_visualize_proteoforms_explicitSamples.push( considered );
-                    }
-                }
-                MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain('A');
-                MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature( );
-            });
-        }
-    };
     MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart);
 
     // Initialize the `MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART` component.
