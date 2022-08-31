@@ -187,7 +187,7 @@ export const AMINO_ACID_COLOR = {
                 type: 'tree',
                 symbol: 'circle',
                 symbolSize: 28,
-                edgeShape: 'curve',
+                edgeShape: 'polyline',
                 roam: true,
                 expandAndCollapse: true,
                 initalTreeDepth: 2,
