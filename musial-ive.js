@@ -375,7 +375,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
         totalCounts.push(nS);
         STATE.mainVisualizeProteoformsNoSamples += nS;
     }
-    STATE.mainVisualizeProteoformsVariantsEchart.series[2].data = totalCounts.map(v => (v / STATE.mainVisualizeProteoformsNoSamples).toFixed(4));
+    STATE.mainVisualizeProteoformsVariantsEchart.series[2].data = totalCounts.map( v => (v / STATE.mainVisualizeProteoformsNoSamples).toFixed(4) );
 
     /*
     let perSampleVP = 0;

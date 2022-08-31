@@ -246,13 +246,30 @@ export const AMINO_ACID_COLOR = {
         },
         axisPointer: {
             link: {
-                xAxisIndex: [ 0 ],
-                yAxisIndex: [ 0 ]
+                xAxisIndex: [ 0, 1 ]
             },
-            snap: true,
             triggerTooltip: false,
             triggerOn: 'mousemove',
-            show: true
+            show: true,
+            label: {
+                backgroundColor: 'rgba(90, 90, 90, 0.8)',
+                fontWeight: 'bold',
+                fontSize: 10,
+                formatter: ( d ) => {
+                    if ( d.axisDimension == 'x' && d.axisIndex == 0 ) {
+                        return d.value;
+                    } else if ( d.axisDimension == 'x' && d.axisIndex == 1 ) {
+                        return "No. Variants " + d.seriesData[ 0 ].data[ 1 ];
+                    } else if ( d.axisDimension == 'y' && d.axisIndex == 0 ) {
+                        let proteoformKey = ( d.value == "Wild Type Gene" || d.value == "Wild Type Protein" ) ? "WildType" : d.value;
+                        let proteoformNoSamples = STATE.vDict.features[ STATE.mainVisualizeSelectedFeature ].allocatedProtein.proteoforms[ proteoformKey ].samples.length;
+                        let proteoformSamplePercentage = ( ( proteoformNoSamples / STATE.mainVisualizeProteoformsNoSamples) * 100 ).toFixed( 1 );
+                        return d.value + " [" + proteoformSamplePercentage + "%]";
+                    } else {
+                        return d.value;
+                    }
+                }
+            }
         },
         xAxis: [
             {
@@ -269,6 +286,10 @@ export const AMINO_ACID_COLOR = {
                 nameGap: 25,
                 nameTextStyle: {
                     fontWeight: 'bold'
+                },
+                axisTick: {
+                    alignWithLabel: true,
+                    interval: 0
                 }
             },
             {
@@ -305,6 +326,10 @@ export const AMINO_ACID_COLOR = {
                 nameGap: 130,
                 nameTextStyle: {
                     fontWeight: 'bold'
+                },
+                axisTick: {
+                    alignWithLabel: true,
+                    interval: 0
                 }
             },
             {
