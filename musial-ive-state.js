@@ -349,7 +349,26 @@ export const AMINO_ACID_COLOR = {
         dataZoom: [
             {
                 type: 'slider',
-                xAxisIndex: 0,
+                xAxisIndex: [ 0, 1 ],
+                oriten: 'horizontal',
+                selectedDataBackground: {
+                    lineStyle: {
+                        width: 0.0
+                    },
+                    areaStyle: {
+                        opacity: 0.0
+                    }
+                },
+                dataBackground: {
+                    lineStyle: {
+                        color: '#464646',
+                        width: 0.3,
+                        type: 'dashed'
+                    },
+                    areaStyle: {
+                        opacity: 0.0
+                    }
+                },
                 top: '2%',
                 bottom: '92.5%',
                 left: '10%',
@@ -372,7 +391,26 @@ export const AMINO_ACID_COLOR = {
             },
             {
                 type: 'slider',
-                yAxisIndex: 0,
+                yAxisIndex: [ 0, 2 ],
+                oritent: 'vertical',
+                selectedDataBackground: {
+                    lineStyle: {
+                        width: 0.0
+                    },
+                    areaStyle: {
+                        opacity: 0.0
+                    }
+                },
+                dataBackground: {
+                    lineStyle: {
+                        color: '#464646',
+                        width: 0.3,
+                        type: 'dashed'
+                    },
+                    areaStyle: {
+                        opacity: 0.0
+                    }
+                },
                 top: '10%',
                 bottom: '10%',
                 left: '91.5%',
