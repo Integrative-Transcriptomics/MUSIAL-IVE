@@ -209,7 +209,7 @@ export const AMINO_ACID_COLOR = {
         ]
     },
     // mainVisualizeProteoformsVariantsEchart: Object; Echart option specification for the per proteoform variants echart.
-    "mainVisualizeProteoformsVariantsEchart": {
+     "mainVisualizeProteoformsVariantsEchart": {
         title: [ ],
         grid: [
             {
@@ -232,6 +232,14 @@ export const AMINO_ACID_COLOR = {
                 bottom: '10%',
                 left: '91.5%',
                 right: '5%'
+            },
+            {
+                id: 'GRID_CUSTOM_TRACKS',
+                top: '0%',
+                bottom: '100%',
+                left: '50%',
+                right: '50%',
+                backgroundColor: '#fafafc'
             }
         ],
         tooltip: {
@@ -311,6 +319,16 @@ export const AMINO_ACID_COLOR = {
                 minInterval: 0.5,
                 show: true,
                 data: [ 0.0, 1.0 ]
+            },
+            {
+                id: 'XAXIS_CUSTOM_TRACKS',
+                type: 'category',
+                gridIndex: 3,
+                show: false,
+                data: [ ],
+                axisPointer: {
+                    show: false
+                }
             }
         ],
         yAxis: [
@@ -349,7 +367,7 @@ export const AMINO_ACID_COLOR = {
                 name: 'No. Variants',
                 nameLocation: 'center',
                 nameRotate: 0,
-                nameGap: 70,
+                nameGap: 40,
                 nameTextStyle: {
                     fontWeight: 'bold'
                 }
@@ -372,13 +390,37 @@ export const AMINO_ACID_COLOR = {
                 nameTextStyle: {
                     fontWeight: 'bold'
                 }
+            },
+            {
+                id: 'YAXIS_CUSTOM_TRACKS',
+                type: 'category',
+                gridIndex: 3,
+                show: false,
+                data: [ 1, 2, 3, 4, 5 ],
+                axisLabel: {
+                    show: false
+                },
+                axisTick: {
+                    show: false
+                },
+                name: 'Annotation Tracks',
+                nameLocation: 'center',
+                nameRotate: 0,
+                nameGap: 40,
+                nameTextStyle: {
+                    fontWeight: 'bold'
+                },
+                axisPointer: {
+                    show: false
+                }
             }
         ],
         dataZoom: [
             {
                 type: 'slider',
-                xAxisIndex: [ 0, 1 ],
+                xAxisIndex: [ 0, 1, 3 ],
                 oriten: 'horizontal',
+                realtime: false,
                 selectedDataBackground: {
                     lineStyle: {
                         width: 0.0
@@ -421,6 +463,7 @@ export const AMINO_ACID_COLOR = {
                 type: 'slider',
                 yAxisIndex: [ 0, 2 ],
                 oritent: 'vertical',
+                realtime: false,
                 selectedDataBackground: {
                     lineStyle: {
                         width: 0.0
@@ -540,6 +583,7 @@ export const AMINO_ACID_COLOR = {
         series: [
             {
                 type: 'heatmap',
+                name: 'POSITION_CONTENT',
                 xAxisIndex: 0,
                 yAxisIndex: 0,
                 data: [],
@@ -547,19 +591,23 @@ export const AMINO_ACID_COLOR = {
                     borderColor: '#fafafc',
                     borderWidth: 0.1
                 },
-                progressive: 1000,
-                animation: false
+                progressive: 0,
+                animation: false,
+                hoverLayerThreshold: 1000
             },
             {
                 type: 'line',
+                name: 'NO_VARIANTS',
                 xAxisIndex: 1,
                 yAxisIndex: 1,
                 data: [],
-                smooth: false,
-                showSymbol: false
+                smooth: 0.1,
+                showSymbol: false,
+                animation: false
             },
             {
                 type: 'bar',
+                name: 'SAMPLE_PROPORTION',
                 xAxisIndex: 2,
                 yAxisIndex: 2,
                 data: [],
@@ -569,10 +617,12 @@ export const AMINO_ACID_COLOR = {
                 itemStyle: {
                     opacity: 0.8,
                     color: '#607196'
-                }
+                },
+                animation: false
             }
         ]
     },
+    // <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M201.4 137.4c12.5-12.5 32.8-12.5 45.3 0l160 160c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 205.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l160-160z"/></svg>
     // mainVisualizeProteoformsPositioninformationEchart: Object; Echart option specification for the position information echart.
     "mainVisualizeProteoformsPositioninformationEchart": {
         legend: {

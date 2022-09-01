@@ -18,6 +18,7 @@
  export var SETTINGS = {
     // _verbose: Boolean; Whether to output user information (currently unused).
     "_verbose": true,
+    "_main_visualize_proteoforms_displayAnnotationTracks": false,
     "_main_visualize_proteoforms_truncateAfterFirstTermination": true,
     "_main_visualize_proteoforms_excludePFWithInternalTermination": false,
     "_main_visualize_proteoforms_PFMinVarPosPerc": 0.0,

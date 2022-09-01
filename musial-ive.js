@@ -21,6 +21,16 @@ import { SETTINGS } from './musial-ive-settings.js';
 /* JSON Schema validator used to validate user input. */
 var SCHEMA_VALIDATOR;
 
+/* Definition of runtime variables that are not stored in the application state. */
+var MAIN_VISUALIZE_OVERVIEW_ECHART_sizeObserver = new ResizeObserver( ( entries ) => {
+    MAIN_VISUALIZE_OVERVIEW_ECHART.resize( { width: entries[ 0 ].width, height: entries[ 0 ].height } );
+} );
+MAIN_VISUALIZE_OVERVIEW_ECHART_sizeObserver.observe( document.getElementById( "main-visualize-overview-echart" ) );
+var MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_sizeObserver = new ResizeObserver( ( entries ) => {
+    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.resize( { width: entries[ 0 ].width, height: entries[ 0 ].height } );
+} );
+MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_sizeObserver.observe( document.getElementById( "main-visualize-proteoforms-variants-echart" ) );
+
 /* Methods that manipulate or to interact with the MAIN_VISUALIZE_OVERVIEW_ECHART object. */
 var MAIN_VISUALIZE_OVERVIEW_ECHART = echarts.init(document.getElementById("main-visualize-overview-echart"), { "renderer": "canvas" });
 
@@ -127,12 +137,13 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature() {
         ( atom, viewer, event, container ) => {
             if( !atom.hover_label ) {
                 atom.hover_label = viewer.addLabel(
-                    atom.resi + "+0 " + atom.resn,
+                    "Pos.: " + atom.resi + " + 0 (" + atom.resn + ")",
                     {
                         position: atom,
                         backgroundColor: '#FAFAFC',
                         backgroundOpacity: 0.8,
-                        fontColor:'black'
+                        fontColor: 'black',
+                        fontSize: 12
                     }
                 );
                 atom.hover_sphere = viewer.addSphere(
@@ -142,13 +153,13 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature() {
                             y: atom.y,
                             z: atom.z
                         },
-                        radius: 1.0,
+                        wireframe: true,
+                        radius: 1.6,
                         color: '#FF5C43',
                         opacity: 1
                     }
                 );
                 viewer.render( );
-                console.log( atom );
             }
         },
         (atom) => {
@@ -164,6 +175,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature() {
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.setHoverDuration( 100 );
     // Zoom to the model.
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.zoomTo( );
+    //MAIN_VISUALIZE_PROTEOFORMS_3DMOL_extractSecondaryStructureSeries( );
 };
 
 /**
@@ -221,6 +233,45 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightSelectedPosition( ) {
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.render();
 };
 
+function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_extractSecondaryStructureSeries( ) {
+    let secStrucResi = { };
+    let secStrucSeries = [ ];
+    let secStrucColors = {
+        "c": "#C4A78E",
+        "s": "#86B8E1",
+        "h": "#E08787"
+    }
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL.getInternalState( ).models[ 0 ].atoms.forEach( atom => {
+        if ( atom.resn != "DUM" ) {
+            if ( !(atom.ss in secStrucResi) ) {
+                secStrucResi[ atom.ss ] = [ ];
+            }
+            secStrucResi[ atom.ss ].push( atom.resi + "+0" );
+        }
+    } );
+    for ( const [ type, positions ] of Object.entries( secStrucResi ) ) {
+        STATE.mainVisualizeProteoformsVariantsEchart.series.push(
+            {
+                type: 'heatmap',
+                name: 'CUSTOM_TRACK_Secondary Structure ' + type,
+                xAxisIndex: 3,
+                yAxisIndex: 3,
+                data: positions.map( p => { return [ p, 0, 0 ] } ),
+                itemStyle: {
+                    color: secStrucColors[ type ],
+                    borderType: [ 5, 10 ]
+                },
+                animation: false,
+                hoverLayerThreshold: 1000,
+                progressive: 0
+            }
+        );
+    }
+
+    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart);
+    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.resize();
+}
+
 /* METHODS TO MANIPULATE AND INTERACT WITH `MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART` */
 var MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART;
 
@@ -246,6 +297,8 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
     
     STATE.mainVisualizeProteoformsVariantsEchart.yAxis[2].data = []; // Index 2 -> Sample frequency track on the right.
     STATE.mainVisualizeProteoformsVariantsEchart.series[2].data = [];
+
+    STATE.mainVisualizeProteoformsVariantsEchart.xAxis[3].data = []; // Index 3 -> Custom tracks.
 
     // Initialize temp. variables.
     var position = 1;
@@ -398,6 +451,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
     for (let position of Object.keys(STATE.mainVisualizeProteoformsPositionInformation).sort(sortPositions)) {
         STATE.mainVisualizeProteoformsVariantsEchart.xAxis[0].data.push(position);
         STATE.mainVisualizeProteoformsVariantsEchart.xAxis[1].data.push(position);
+        STATE.mainVisualizeProteoformsVariantsEchart.xAxis[3].data.push(position);
         for (let [proteoform, variant] of Object.entries(STATE.mainVisualizeProteoformsPositionInformation[position])) {
             STATE.mainVisualizeProteoformsVariantsEchart.series[0].data.push([i, filteredProteoformKeys.indexOf(proteoform), AMINO_ACID_ENCODING[variant]]);
         }
@@ -426,7 +480,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
 };
 
 /**
- * Returns the HTML string content to display for the proteoform filter tool.
+ * Fires the SWAL event to display the proteoform filter tool popup window.
  */
 function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openFilterDialog( ) {
     // Extract set `excludePFWithInternalTermination` value from SETTINGS.
@@ -451,7 +505,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openFilterDialog( ) {
             <tbody>
                 <tr>
                     <td>Exlude Proteoforms with Premature Termination</td>
-                    <td><input id="tmp-visualize-proteoforms-setting-excludePFWithInternalTermination" type="checkbox" data-material="true" data-cls-check="bd-red" data-role="switch"` + settingsExcludePTPFschecked + `></td>
+                    <td><input id="tmp-visualize-proteoforms-setting-excludePFWithInternalTermination" type="checkbox" data-cls-check="customCheck bd-gray" data-cls-switch="customSwitch" data-role="switch"` + settingsExcludePTPFschecked + `></td>
                 </tr>
                 <tr>
                     <td>Min. Percentage of Variable Positions</td>
@@ -499,6 +553,76 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openFilterDialog( ) {
         MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature( );
     });
 }
+
+/**
+ * Fires the SWAL event to display the proteoform custom tracks tool popup window.
+ */
+function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openTracksDialog( ) {
+    // Extract set `displayAnnotationTracks` value from SETTINGS.
+    let settingsDisplayAnnotationTracks = SETTINGS._main_visualize_proteoforms_displayAnnotationTracks ? "checked" : "";
+    let htmlContent = `
+    <p class="text-left w-25" style="display: inline-block;">Display Annotation Tracks</p>
+    <input id="tmp-visualize-proteoforms-setting-displayAnnotationTracks" style="display: inline-block;" type="checkbox" data-cls-check="customCheck bd-gray" data-cls-switch="customSwitch" data-role="switch"` + settingsDisplayAnnotationTracks + `>
+    <hr>
+    <ul data-role="listview" data-view="content" data-selectabel="true">
+        <li data-icon="<i class='fa-solid fa-bars-staggered'></i>" data-caption="Track 1" data-content="<span class='text-muted'>Start: 1 | End: 502 | Value: Helix</span>"></li>
+            <ul>
+                <li>1 50</li>
+                <li>56 90</li>
+            </ul>
+        <li data-caption="Track 2"></li>
+    </ul>
+    `
+    Swal.fire({
+        title: 'Custom Annotation Tracks',
+        width: 1200,
+        padding: '1%',
+        color: '#6d81ad',
+        background: '#EFF0F8',
+        html: htmlContent,
+        didOpen: ( ) => {
+            //Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinVarPosPerc" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinVarPosPerc );
+            //Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinNoSamples" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinNoSamples );
+        },
+        backdrop: 'rgba(139, 140, 148, 0.5) no-repeat',
+        confirmButtonColor: '#6d81ad'
+    }).then( _ => {
+        SETTINGS._main_visualize_proteoforms_displayAnnotationTracks =  $( "#tmp-visualize-proteoforms-setting-displayAnnotationTracks" ).is(':checked');
+        MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_toggleAnnotationTracks( SETTINGS._main_visualize_proteoforms_displayAnnotationTracks );
+    });
+}
+
+/**
+ * Toggles display mode of the custom annotations track.
+ * 
+ * @param {boolean} display - Whether to show or hide the custom annotations track.
+ */
+ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_toggleAnnotationTracks( display ) {
+    if ( display ) {
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].top = "8.5%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].right = "10%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].bottom = "81%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].left = "10%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].show = true;
+        STATE.mainVisualizeProteoformsVariantsEchart.yAxis[ 3 ].show = true;
+
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 0 ].top = "20%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 2 ].top = "20%";
+        STATE.mainVisualizeProteoformsVariantsEchart.dataZoom[ 1 ].top = "20%";
+    } else {
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].top = "0%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].right = "50%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].bottom = "100%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].left = "50%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].show = false;
+        STATE.mainVisualizeProteoformsVariantsEchart.yAxis[ 3 ].show = false;
+
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 0 ].top = "10%";
+        STATE.mainVisualizeProteoformsVariantsEchart.grid[ 2 ].top = "10%";
+        STATE.mainVisualizeProteoformsVariantsEchart.dataZoom[ 1 ].top = "10%";
+    }
+    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart);
+ }
 
 /**
  * Resets all proteoform filters to default values.
@@ -552,6 +676,7 @@ var MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART;
 function MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_openDialog( selection ) {
     let position = selection.name;
     let proteoformName = STATE.mainVisualizeProteoformsVariantsEchart.yAxis[0].data[selection.data[1]];
+    proteoformName = proteoformName.startsWith( "Wild Type" ) ? "Wild Type" : proteoformName;
     let mutatedResidue = AMINO_ACID_DECODING[selection.data[2]];
     let wildTypeResidue;
     if (position.split("+")[1] === "0") {
@@ -562,7 +687,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_openDialog( selection ) 
     let noVariants = STATE.mainVisualizeProteoformsVariantsEchart.series[1].data.filter(e => e[0] == position)[0][1]
     let positionComposition = MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_getPositionComposition(position);
     $( '#main-visualize-proteoforms-positioninformation-proteoformID' ).html( 'Proteoform <b>' + proteoformName + '</b>' );
-    $( '#main-visualize-proteoforms-positioninformation-noSamples' ).html( 'No. Samples <b>' + STATE.vDict.features[ STATE.mainVisualizeSelectedFeature ].allocatedProtein.proteoforms[ proteoformName ].samples.length + '</b>' );
+    $( '#main-visualize-proteoforms-positioninformation-noSamples' ).html( 'No. Samples <b>' + STATE.vDict.features[ STATE.mainVisualizeSelectedFeature ].allocatedProtein.proteoforms[ proteoformName.replace( " ", "" )  ].samples.length + '</b>' );
     $( '#main-visualize-proteoforms-positioninformation-position' ).html( 'Relative Position <b>' + position + '</b>' );
     $( '#main-visualize-proteoforms-positioninformation-variant' ).html( 'Variant <b>' + AMINO_ACID_DESIGNATION[wildTypeResidue] + ' &#8594; ' + AMINO_ACID_DESIGNATION[mutatedResidue] + '</b>' );
     $( '#main-visualize-proteoforms-positioninformation-noVariants' ).html( 'No. Variants <b>' + noVariants + '</b>' );
@@ -609,6 +734,7 @@ window.onload = _ => {
     document.getElementById("main-visualize-overview-fileinput").onchange = fileInputChange;
     document.getElementById("main-visualize-proteoforms-backbutton").onclick = _ => toggleComponent('visualize-overview');
     document.getElementById("main-visualize-proteoforms-toolFilter").onclick = _ => MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openFilterDialog( );
+    document.getElementById("main-visualize-proteoforms-toolTracks").onclick = _ => MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openTracksDialog( );
     document.getElementById("main-visualize-proteoforms-positioninformation-closebutton").onclick = _ => MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_closeDialog( );
 
     // Initialize the `MAIN_VISUALIZE_OVERVIEW_ECHART` component.

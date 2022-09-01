@@ -88,12 +88,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     <li><button id="main-visualize-proteoforms-backbutton" class="tool-button rounded light"><i style="font-size: large;" class="fas fa-caret-left"></i></button></li>
                     <li><button id="main-visualize-proteoforms-featureinformation" class="button light"></button></li>
                     <li><button id="main-visualize-proteoforms-toolFilter" class="tool-button rounded light"><i class="fa-solid fa-filter"></i></button></li>
-                    <li><button id="main-visualize-proteoforms-toolHighlight" class="tool-button rounded light"><i class="fa-solid fa-highlighter"></i></button></li>
-                    <li><button id="main-visualize-proteoforms-toolTracks" class="tool-button rounded light"><i class="fa-solid fa-chart-bar"></i></button></li>
+                    <li><button id="main-visualize-proteoforms-toolHighlight" class="tool-button rounded light" disabled><i class="fa-solid fa-highlighter"></i></button></li>
+                    <li><button id="main-visualize-proteoforms-toolTracks" class="tool-button rounded light" disabled><i class="fa-solid fa-chart-bar"></i></button></li>
                 </ul>
             </div>
-            <div id="main-visualize-proteoforms-3dmol"></div>
-            <div id="main-visualize-proteoforms-positioninformation" style="display: none;">
+            <div id="main-visualize-proteoforms-positioninformation" data-role="draggable" style="display: none;">
                 <button id="main-visualize-proteoforms-positioninformation-closebutton" class="noDecoration"><i class="fa-solid fa-xmark"></i></button>
                 <p id="main-visualize-proteoforms-positioninformation-proteoformID"></p>
                 <p id="main-visualize-proteoforms-positioninformation-noSamples"></p>
@@ -102,7 +101,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <p id="main-visualize-proteoforms-positioninformation-noVariants"></p>
                 <div id="main-visualize-proteoforms-positioninformation-echart" style="width: 340px; height: 230px;"></div>
             </div>
-            <div id="main-visualize-proteoforms-variants-echart"></div>
+            <div data-role="splitter" class="h-100" data-split-mode="vertical" data-min-sizes="200">
+                <div id="main-visualize-proteoforms-3dmol" class="d-flex flex-justify-center flex-align-center"></div>
+                <div id="main-visualize-proteoforms-variants-echart" class="d-flex flex-justify-center flex-align-center"></div>
+            </div>
         </div>
         <!--
         Legal notice component:
