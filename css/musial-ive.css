@@ -147,16 +147,14 @@ body.swal2-shown > [aria-hidden="true"] {
   position: absolute;
   top: 5px;
   left: 5px;
-  width: 60px;
 }
 #main-visualize-proteoforms-featureinformation {
   z-index: 2;
   color: var(--color-1); 
   background-color: transparent;
   position: absolute;
-  top: 5px;
-  left: 70px;
-  width: 60px;
+  top: 1px;
+  left: 40px;
   text-align: center;
   cursor: default;
   border: none;
@@ -167,21 +165,21 @@ body.swal2-shown > [aria-hidden="true"] {
   color: var(--color-1);
   position: absolute;
   top: 5px;
-  left: 135px;
+  left: 120px;
 }
 #main-visualize-proteoforms-toolHighlight {
   z-index: 2;
   color: var(--color-1);
   position: absolute;
   top: 5px;
-  left: 175px;
+  left: 160px;
 }
 #main-visualize-proteoforms-toolTracks {
   z-index: 2;
   color: var(--color-1);
   position: absolute;
   top: 5px;
-  left: 215px;
+  left: 200px;
 }
 #main-visualize-proteoforms-3dmol {
   border: 1px solid #E4E5ED;
