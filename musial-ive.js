@@ -118,6 +118,50 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature() {
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.clear( );
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.addModel(STATE.vDict.features[STATE.mainVisualizeSelectedFeature].allocatedProtein.pdb, "pdb");
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL_applyDefaultStyle( );
+    // Add hover callback to viewer.
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL.setHoverable(
+        {
+            // Empty object -> trigger hovering on all atoms.
+        },
+        true, // Enable hovering.
+        ( atom, viewer, event, container ) => {
+            if( !atom.hover_label ) {
+                atom.hover_label = viewer.addLabel(
+                    atom.resi + "+0 " + atom.resn,
+                    {
+                        position: atom,
+                        backgroundColor: '#FAFAFC',
+                        backgroundOpacity: 0.8,
+                        fontColor:'black'
+                    }
+                );
+                atom.hover_sphere = viewer.addSphere(
+                    {
+                        center: {
+                            x: atom.x,
+                            y: atom.y,
+                            z: atom.z
+                        },
+                        radius: 1.0,
+                        color: '#FF5C43',
+                        opacity: 1
+                    }
+                );
+                viewer.render( );
+                console.log( atom );
+            }
+        },
+        (atom) => {
+            if( atom.hover_label ) {
+                MAIN_VISUALIZE_PROTEOFORMS_3DMOL.removeLabel( atom.hover_label );
+                MAIN_VISUALIZE_PROTEOFORMS_3DMOL.removeShape( atom.hover_sphere );
+                delete atom.hover_label;
+                delete atom.hover_sphere;
+                MAIN_VISUALIZE_PROTEOFORMS_3DMOL.render( );
+            }
+        }
+    );
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL.setHoverDuration( 100 );
     // Zoom to the model.
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.zoomTo( );
 };
@@ -376,24 +420,6 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
         STATE.mainVisualizeProteoformsNoSamples += nS;
     }
     STATE.mainVisualizeProteoformsVariantsEchart.series[2].data = totalCounts.map( v => (v / STATE.mainVisualizeProteoformsNoSamples).toFixed(4) );
-
-    /*
-    let perSampleVP = 0;
-    let samplePT = 0;
-    for (let proteoformKey of filteredProteoformKeys) {
-        if (proteoformKey == "Wild Type Protein") {
-            continue;
-        } else {
-            if (proteoformKey == "Wild Type Gene") {
-                proteoformKey = "WildType";
-            }
-            perSampleVP += STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].samples.length * STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].annotations.VP;
-            if (STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].annotations.PT == "true") {
-                samplePT += STATE.vDict.features[STATE.selectedFeature].allocatedProtein.proteoforms[proteoformKey].samples.length
-            }
-        }
-    }
-    */
 
     MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart);
     MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.resize();
