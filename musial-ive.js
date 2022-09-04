@@ -112,6 +112,7 @@ function MAIN_VISUALIZE_OVERVIEW_ECHART_addFeature(chr, cls, ftr) {
             symbolSize: computeSymbolSize(noProteoforms),
             symbol: 'circle',
         };
+        STATE.mainVisualizeProteoformsAnnotationsPerFeature[ ftr ] = [ ];
         clsLevelNode.children.push(ftrLevelNode);
     }
     MAIN_VISUALIZE_OVERVIEW_ECHART.setOption(STATE.mainVisualizeOverviewEchart);
@@ -175,7 +176,8 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_setSelectedFeature() {
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.setHoverDuration( 100 );
     // Zoom to the model.
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.zoomTo( );
-    //MAIN_VISUALIZE_PROTEOFORMS_3DMOL_extractSecondaryStructureSeries( );
+    // Infer secondary structure annotation.
+    MAIN_VISUALIZE_PROTEOFORMS_3DMOL_inferSecondaryStructureAnnotation( );
 };
 
 /**
@@ -233,42 +235,51 @@ function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightSelectedPosition( ) {
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.render();
 };
 
-function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_extractSecondaryStructureSeries( ) {
-    let secStrucResi = { };
-    let secStrucSeries = [ ];
-    let secStrucColors = {
-        "c": "#C4A78E",
-        "s": "#86B8E1",
-        "h": "#E08787"
-    }
+/**
+ * Extracts information about secondary structure from the 3DMol.js protein model and stores the information as annotation tracks.
+ */
+function MAIN_VISUALIZE_PROTEOFORMS_3DMOL_inferSecondaryStructureAnnotation( ) {
+    let secStrucSegments = { "c": [ ], "s": [ ], "h": [ ] };
+    let secStrucColors = { "c": "#C4A78E", "s": "#86B8E1", "h": "#E08787" };
+    let currentSecStruc = "";
+    let segmentStart = "";
+    let segmentEnd = "";
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL.getInternalState( ).models[ 0 ].atoms.forEach( atom => {
         if ( atom.resn != "DUM" ) {
-            if ( !(atom.ss in secStrucResi) ) {
-                secStrucResi[ atom.ss ] = [ ];
+            if ( atom.ss !== currentSecStruc ) {
+                if ( currentSecStruc !== "" ) {
+                    secStrucSegments[ currentSecStruc ].push( segmentStart + "+0-" + segmentEnd + "+0" );
+                }
+                currentSecStruc = atom.ss;
+                segmentStart = atom.resi;
             }
-            secStrucResi[ atom.ss ].push( atom.resi + "+0" );
+            segmentEnd = atom.resi;
         }
     } );
-    for ( const [ type, positions ] of Object.entries( secStrucResi ) ) {
-        STATE.mainVisualizeProteoformsVariantsEchart.series.push(
-            {
-                type: 'heatmap',
-                name: 'CUSTOM_TRACK_Secondary Structure ' + type,
-                xAxisIndex: 3,
-                yAxisIndex: 3,
-                data: positions.map( p => { return [ p, 0, 0 ] } ),
-                itemStyle: {
-                    color: secStrucColors[ type ],
-                    borderType: [ 5, 10 ]
-                },
-                animation: false,
-                hoverLayerThreshold: 1000,
-                progressive: 0
-            }
-        );
+    secStrucSegments[ currentSecStruc ].push( segmentStart + "+0-" + segmentEnd + "+0" );
+    for ( const [ t, s ] of Object.entries( secStrucSegments ) ) {
+        let label = "";
+        let segments = "";
+        let color = "";
+        if ( t == "c" ) {
+            label = "Secondary Structure: Coil";
+            segments = s.join( "," );
+            color = secStrucColors[ t ];
+        } else if ( t == "s" ) {
+            label = "Secondary Structure: Sheet";
+            segments = s.join( "," );
+            color = secStrucColors[ t ];
+        } else if ( t == "h" ) {
+            label = "Secondary Structure: Helix";
+            segments = s.join( "," );
+            color = secStrucColors[ t ];
+        }
+        if ( !STATE.mainVisualizeProteoformsAnnotationsPerFeature[ STATE.mainVisualizeSelectedFeature ].some( annotationObject => annotationObject.label == label ) ) {
+            STATE.mainVisualizeProteoformsAnnotationsPerFeature[ STATE.mainVisualizeSelectedFeature ].push( { "label": label, "track": 0, "segments": segments, "color": color, "display": true } );
+            MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_addAnnotation( label, segments, 0, color );
+        }
     }
-
-    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart);
+    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart, {replaceMerge: ['series']});
     MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.resize();
 }
 
@@ -287,7 +298,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
     STATE.mainVisualizeProteoformsMetaInformation = {};
     STATE.mainVisualizeProteoformsNoSamples = 0;
     STATE.mainVisualizeProteoformsNoProteoforms = 0;
-    // Reset EChart axis information.
+    // Clear EChart information.
     STATE.mainVisualizeProteoformsVariantsEchart.xAxis[0].data = []; // Index 0 -> Heatmap with per sample, per position variants.
     STATE.mainVisualizeProteoformsVariantsEchart.yAxis[0].data = [];
     STATE.mainVisualizeProteoformsVariantsEchart.series[0].data = [];
@@ -299,6 +310,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
     STATE.mainVisualizeProteoformsVariantsEchart.series[2].data = [];
 
     STATE.mainVisualizeProteoformsVariantsEchart.xAxis[3].data = []; // Index 3 -> Custom tracks.
+    STATE.mainVisualizeProteoformsVariantsEchart.series = STATE.mainVisualizeProteoformsVariantsEchart.series.splice( 0, 3 ); // Remove all annotations.
 
     // Initialize temp. variables.
     var position = 1;
@@ -475,7 +487,19 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_setChain(chain) {
     }
     STATE.mainVisualizeProteoformsVariantsEchart.series[2].data = totalCounts.map( v => (v / STATE.mainVisualizeProteoformsNoSamples).toFixed(4) );
 
-    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart);
+    // Add any existing annotation tracks.
+    STATE.mainVisualizeProteoformsAnnotationsPerFeature[ STATE.mainVisualizeSelectedFeature ].forEach( annotationObject => {
+        if ( annotationObject.display ) {
+            MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_addAnnotation(
+                annotationObject.label,
+                annotationObject.segments,
+                annotationObject.track,
+                annotationObject.color
+            );
+        }
+    } );
+
+    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart, {notMerge: true});
     MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.resize();
 };
 
@@ -524,8 +548,8 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openFilterDialog( ) {
     </div>
     `
     Swal.fire({
-        title: 'Proteoform Filters',
-        width: 1200,
+        title: 'Apply Filters',
+        width: "70%",
         padding: '1%',
         color: '#6d81ad',
         background: '#EFF0F8',
@@ -558,37 +582,120 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openFilterDialog( ) {
  * Fires the SWAL event to display the proteoform custom tracks tool popup window.
  */
 function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openTracksDialog( ) {
+    /** 
+     * Adds a row to the table element of the tracks dialog.
+     * 
+     * @param {Object} annotation - Optional existing annotation.
+     */
+    var addAnnotationTableEntry = ( annotation ) => {
+        let isNewEntry = false;
+        if ( typeof annotation === 'undefined' ) {
+            annotation = {
+                "label": Math.random( ).toString().slice(2, 8),
+                "track": 0,
+                "segments": "1+0-10+0",
+                "color": "#000000",
+                "display": true,
+                "deletable": true
+            };
+            isNewEntry = true;
+        }
+        let tableEntryHtmlContent = `
+        <tr id="` + annotation.label + `">
+            <td>
+                <input id="` + annotation.label + `Label" type="text" data-role="input" data-default-value="` + annotation.label + `" data-clear-button="false" ` + ( isNewEntry ? `` : `disabled` ) + `>
+            </td>
+            <td>
+                <select id="` + annotation.label + `Track" data-role="select" data-filter="false" data-empty-value="Select Track">
+                    <option value="0"` + ( annotation.track == 0 ? `selected="selected"` : `` ) + `>Bottom</option>
+                    <option value="2"` + ( annotation.track == 2 ? `selected="selected"` : `` ) + `>Mid</option>
+                    <option value="4"` + ( annotation.track == 4 ? `selected="selected"` : `` ) + `>Top</option>
+                </select>
+            </td>
+            <td>
+                <input id="` + annotation.label + `Segments" type="text" data-role="taginput" data-tag-trigger="Space" value="` + annotation.segments + `">
+            </td>
+            <td>
+                <input id="` + annotation.label + `Color" type="color" value="` + annotation.color + `"></input>
+            </td>
+            <td>
+                <input id="` + annotation.label + `Display" type="checkbox" data-role="checkbox" data-cls-check="bd-gray bg-gray" ` + ( annotation.display ? `checked` : `` ) + `>
+            </td>
+            <td>
+                <button id="` + annotation.label + `DeleteButton" class="button rounded mini ribbed-red fg-white" onclick="document.getElementById('` + annotation.label + `').remove( );"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        </tr>
+        `
+        $( '#tmp-visualize-proteoforms-toolTracks-annotationsTable' ).append(tableEntryHtmlContent);
+    };
     // Extract set `displayAnnotationTracks` value from SETTINGS.
     let settingsDisplayAnnotationTracks = SETTINGS._main_visualize_proteoforms_displayAnnotationTracks ? "checked" : "";
+    // Definition of the html content to display on the dialog.
     let htmlContent = `
-    <p class="text-left w-25" style="display: inline-block;">Display Annotation Tracks</p>
-    <input id="tmp-visualize-proteoforms-setting-displayAnnotationTracks" style="display: inline-block;" type="checkbox" data-cls-check="customCheck bd-gray" data-cls-switch="customSwitch" data-role="switch"` + settingsDisplayAnnotationTracks + `>
+    <div class="grid my-1 p-1">
+        <div class="row flex-align-center">
+            <div class="stub" style="width: 22%">
+                <p>Display Annotation Tracks</p>
+            </div>
+            <div class="stub" style="width: 5%">
+                <input id="tmp-visualize-proteoforms-setting-displayAnnotationTracks" type="checkbox" data-cls-check="customCheck bd-gray" data-cls-switch="customSwitch" data-role="switch"` + settingsDisplayAnnotationTracks + `>
+            </div>
+            <div class="stub" style="width: 63%">
+            </div>
+            <div class="stub" style="width: 10%">
+                <button id="tmp-visualize-proteoforms-toolTracks-addAnnotationButton" class="button rounded success mini" style="display: inline-block;">New Annotation</button>
+            </div>
+        </div>
+    </div>
     <hr>
-    <ul data-role="listview" data-view="content" data-selectabel="true">
-        <li data-icon="<i class='fa-solid fa-bars-staggered'></i>" data-caption="Track 1" data-content="<span class='text-muted'>Start: 1 | End: 502 | Value: Helix</span>"></li>
-            <ul>
-                <li>1 50</li>
-                <li>56 90</li>
-            </ul>
-        <li data-caption="Track 2"></li>
-    </ul>
+    <table class="table subcompact">
+        <thead>
+            <tr>
+                <th class="fg-darkGray w-25">Label</th>
+                <th class="fg-darkGray">Track</th>
+                <th class="fg-darkGray">Segments</th>
+                <th class="fg-darkGray">Color</th>
+                <th class="fg-darkGray">Display</th>
+                <th class="fg-darkGray"></th>
+            </tr>
+        </thead>
+        <tbody id="tmp-visualize-proteoforms-toolTracks-annotationsTable">
+        </tbody>
+    </table>
     `
     Swal.fire({
-        title: 'Custom Annotation Tracks',
-        width: 1200,
+        title: 'Manage Annotation Tracks',
+        width: '70%',
         padding: '1%',
         color: '#6d81ad',
         background: '#EFF0F8',
         html: htmlContent,
-        didOpen: ( ) => {
-            //Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinVarPosPerc" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinVarPosPerc );
-            //Metro.getPlugin( $( "#tmp-visualize-proteoforms-setting-PFMinNoSamples" ) ,'spinner').val( SETTINGS._main_visualize_proteoforms_PFMinNoSamples );
+        didOpen: _ => {
+            document.getElementById( "tmp-visualize-proteoforms-toolTracks-addAnnotationButton" ).onclick = _ => addAnnotationTableEntry( );
+            STATE.mainVisualizeProteoformsAnnotationsPerFeature[ STATE.mainVisualizeSelectedFeature ].forEach( annotationObject => addAnnotationTableEntry( annotationObject ) )
         },
         backdrop: 'rgba(139, 140, 148, 0.5) no-repeat',
         confirmButtonColor: '#6d81ad'
     }).then( _ => {
+        // Reset anntation objects and series.
+        STATE.mainVisualizeProteoformsAnnotationsPerFeature[ STATE.mainVisualizeSelectedFeature ] = [ ];
+        STATE.mainVisualizeProteoformsVariantsEchart.series = STATE.mainVisualizeProteoformsVariantsEchart.series.splice( 0, 3 );
+        for (let i = 0; i < document.getElementById("tmp-visualize-proteoforms-toolTracks-annotationsTable").children.length; i++) {
+            let id = document.getElementById("tmp-visualize-proteoforms-toolTracks-annotationsTable").children[i].id;
+            let label = document.getElementById( id + "Label" ).value;
+            let track = parseInt( document.getElementById( id + "Track" ).value );
+            let segments = document.getElementById( id + "Segments" ).value;
+            let color = document.getElementById( id + "Color" ).value;
+            let display = document.getElementById( id + "Display" ).checked;
+            STATE.mainVisualizeProteoformsAnnotationsPerFeature[ STATE.mainVisualizeSelectedFeature ].push( { "label": label, "track": track, "segments": segments, "color": color, "display": display } );
+            if ( display ) {
+                MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_addAnnotation( label, segments, track, color );
+            }
+        }
         SETTINGS._main_visualize_proteoforms_displayAnnotationTracks =  $( "#tmp-visualize-proteoforms-setting-displayAnnotationTracks" ).is(':checked');
         MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_toggleAnnotationTracks( SETTINGS._main_visualize_proteoforms_displayAnnotationTracks );
+        MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart, {replaceMerge: ['series']});
+        MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.resize();
     });
 }
 
@@ -605,7 +712,6 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openTracksDialog( ) {
         STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].left = "10%";
         STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].show = true;
         STATE.mainVisualizeProteoformsVariantsEchart.yAxis[ 3 ].show = true;
-
         STATE.mainVisualizeProteoformsVariantsEchart.grid[ 0 ].top = "20%";
         STATE.mainVisualizeProteoformsVariantsEchart.grid[ 2 ].top = "20%";
         STATE.mainVisualizeProteoformsVariantsEchart.dataZoom[ 1 ].top = "20%";
@@ -616,7 +722,6 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openTracksDialog( ) {
         STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].left = "50%";
         STATE.mainVisualizeProteoformsVariantsEchart.grid[ 3 ].show = false;
         STATE.mainVisualizeProteoformsVariantsEchart.yAxis[ 3 ].show = false;
-
         STATE.mainVisualizeProteoformsVariantsEchart.grid[ 0 ].top = "10%";
         STATE.mainVisualizeProteoformsVariantsEchart.grid[ 2 ].top = "10%";
         STATE.mainVisualizeProteoformsVariantsEchart.dataZoom[ 1 ].top = "10%";
@@ -630,6 +735,41 @@ function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_openTracksDialog( ) {
 function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_resetFeatureSpecificProteoformFilters( ) {
     SETTINGS._main_visualize_proteoforms_PFMinNoSamples = 0;
     SETTINGS._main_visualize_proteoforms_explicitPFs = [ ];
+}
+
+/**
+ * Adds a heatmap type series to the MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART annotations track grid.
+ * 
+ * @param {string} label - The label, i.e., the name, of the annotation.
+ * @param {Array} segments - The segments, i.e., two - separated relative positions, at which the annotation shall be displayed.
+ * @param {int} track - The track on which the annotation shall be displayed; Has to be 0, 2 and 4 for the bottom, mid and top track, respectively.
+ * @param {string} color - HEX format color used for the annotation.
+ */
+function MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART_addAnnotation( label, segments, track, color ) {
+    let positions = [ ];
+    for (let segment of segments.split( "," ) ) {
+        let segmentStart = STATE.mainVisualizeProteoformsVariantsEchart.xAxis[ 0 ].data.indexOf( segment.split( "-" )[ 0 ] );
+        let segmentEnd = STATE.mainVisualizeProteoformsVariantsEchart.xAxis[ 0 ].data.indexOf( segment.split( "-" )[ 1 ] );
+        for (let p = segmentStart; p <= segmentEnd; p++) {
+            positions.push( parseInt( p ) );
+        }
+    }
+    STATE.mainVisualizeProteoformsVariantsEchart.series.push(
+        {
+            type: 'heatmap',
+            name: 'CUSTOM_TRACK_' + label,
+            xAxisIndex: 3,
+            yAxisIndex: 3,
+            data: positions.map( p => [ p, track, 0 ] ),
+            itemStyle: {
+                color: color,
+                borderType: [ 5, 10 ]
+            },
+            animation: false,
+            hoverLayerThreshold: 1000,
+            progressive: 0
+        }
+    );
 }
 
 /**
@@ -703,7 +843,7 @@ function MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_openDialog( selection ) 
             }
         });
     }
-    MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART.setOption(STATE.mainVisualizeProteoformsPositioninformationEchart);
+    MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART.setOption(STATE.mainVisualizeProteoformsPositioninformationEchart, true);
     STATE.mainVisualizeProteoformsSelection[ STATE.mainVisualizeSelectedFeature ] = { "name": selection.name, "data": selection.data };
     MAIN_VISUALIZE_PROTEOFORMS_3DMOL_highlightSelectedPosition( );
     displayComponent( "main-visualize-proteoforms-positioninformation", "block" );
@@ -782,7 +922,7 @@ window.onload = _ => {
 
     // Initialize the `MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART` component.
     MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART = echarts.init(document.getElementById("main-visualize-proteoforms-variants-echart"), { "renderer": "canvas", "width": 'auto', "height": 'auto' });
-    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart);
+    MAIN_VISUALIZE_PROTEOFORMS_VARIANTS_ECHART.setOption(STATE.mainVisualizeProteoformsVariantsEchart, {replaceMerge: ['series']});
 
     // Initialize the `MAIN_VISUALIZE_PROTEOFORMS_POSITIONINFORMATION_ECHART` component.
     STATE.mainVisualizeProteoformsVariantsEchart.tooltip.formatter = ( content ) => {

@@ -138,6 +138,8 @@ export const AMINO_ACID_COLOR = {
     "mainVisualizeProteoformsNoProteoforms": null,
     // mainVisualizeProteoformsNoSamples: null or int; The number of samples of the selected feature.
     "mainVisualizeProteoformsNoSamples": null,
+    // mainVisualizeProteoformsAnnotationsPerFeature: Object; Stores custom annotation tracks information per feature.
+    "mainVisualizeProteoformsAnnotationsPerFeature": { },
     // mainVisualizeOverviewEchart: Object; Echart option specification for the overview echart.
     "mainVisualizeOverviewEchart": {
         title: {
@@ -245,14 +247,6 @@ export const AMINO_ACID_COLOR = {
         tooltip: {
             trigger: 'item',
             triggerOn: 'click',
-            alwaysShowContent: true,
-            axisPointer: {
-                type: 'cross'
-            },
-            position: [ '1%', '-85%' ],
-            extraCssText: "height: 80%; width: 24%; overflow-y: scroll;",
-            borderColor: '#607196',
-            borderWidth: 0,
             formatter: null
         },
         axisPointer: {
@@ -396,7 +390,7 @@ export const AMINO_ACID_COLOR = {
                 type: 'category',
                 gridIndex: 3,
                 show: false,
-                data: [ 1, 2, 3, 4, 5 ],
+                data: [ "BottomTrack", "Spacer1", "MidTrack", "Spacer2", "TopTrack" ],
                 axisLabel: {
                     show: false
                 },
@@ -622,7 +616,6 @@ export const AMINO_ACID_COLOR = {
             }
         ]
     },
-    // <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M201.4 137.4c12.5-12.5 32.8-12.5 45.3 0l160 160c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 205.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l160-160z"/></svg>
     // mainVisualizeProteoformsPositioninformationEchart: Object; Echart option specification for the position information echart.
     "mainVisualizeProteoformsPositioninformationEchart": {
         legend: {

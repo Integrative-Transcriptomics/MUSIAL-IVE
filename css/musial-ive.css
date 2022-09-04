@@ -32,16 +32,19 @@
 /* Definition of style properties for classes. */
 ::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
   margin-left: 1px;
   margin-bottom: 1px;
 }
 ::-webkit-scrollbar-track {
   background: var(--background-color-2);
+  border-radius: 2px;
   margin-left: 1px;
   margin-bottom: 1px;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-2);
+  border-radius: 2px;
   margin: 1px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -192,6 +195,13 @@ body.swal2-shown > [aria-hidden="true"] {
   position: absolute;
   top: 5px;
   left: 200px;
+}
+#main-visualize-proteoforms-toolModels {
+  z-index: 2;
+  color: var(--color-1);
+  position: absolute;
+  top: 5px;
+  left: 240px;
 }
 #main-visualize-proteoforms-3dmol {
   border: 1px solid #E4E5ED;
